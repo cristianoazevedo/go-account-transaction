@@ -8,9 +8,9 @@ type Date interface {
 	GetValue() string
 }
 
-func NewDate() *date {
+func NewDate(value string) *date {
 	return &date{
-		value: "",
+		value: value,
 	}
 }
 

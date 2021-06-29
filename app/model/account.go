@@ -1,8 +1,8 @@
 package model
 
 type account struct {
-	id        *id
-	createdAt *date
+	id        ID
+	createdAt Date
 	document  Document
 }
 
@@ -15,9 +15,13 @@ type Account interface {
 func NewAccount(document Document) *account {
 	return &account{
 		id:        NewID(),
-		createdAt: NewDate(),
+		createdAt: NewDate("today"),
 		document:  document,
 	}
+}
+
+func BuildAccount(id string, document string, createdAt string) *account {
+	return &account{id: BuildId(id), document: NewDocument(document), createdAt: NewDate(createdAt)}
 }
 
 func (account *account) GetId() ID {

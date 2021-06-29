@@ -11,6 +11,7 @@ import (
 
 	"github.com/csazevedo/go-account-transaction/app/drive/database"
 	"github.com/csazevedo/go-account-transaction/app/driven/webapi/action"
+	"github.com/csazevedo/go-account-transaction/app/driven/webapi/middleware"
 	"github.com/csazevedo/go-account-transaction/config"
 
 	"github.com/gorilla/mux"
@@ -21,7 +22,7 @@ type webserver struct {
 	dbAdapter *sql.DB
 }
 
-type requestHandlerFunction func(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request)
+type handleRequestFunction func(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request)
 
 func New(c *config.Config) *webserver {
 	router := mux.NewRouter()
@@ -38,13 +39,21 @@ func (ws *webserver) routing() {
 
 	transactionRouter := v1.PathPrefix("/transactions").Subrouter()
 	transactionRouter.HandleFunc("", ws.handleRequest(action.CreateTransaction)).Methods(http.MethodPost)
+	transactionRouter.Use(
+		middleware.NewLogger().Middleware,
+		middleware.NewAuthorization().Middleware,
+	)
 
 	accountRouter := v1.PathPrefix("/accounts").Subrouter()
 	accountRouter.HandleFunc("", ws.handleRequest(action.CreateAccount)).Methods(http.MethodPost)
 	accountRouter.HandleFunc("/{id:[0-9]+}", ws.handleRequest(action.GetAccount)).Methods(http.MethodGet)
+	accountRouter.Use(
+		middleware.NewLogger().Middleware,
+		middleware.NewAuthorization().Middleware,
+	)
 }
 
-func (ws *webserver) handleRequest(action requestHandlerFunction) http.HandlerFunc {
+func (ws *webserver) handleRequest(action handleRequestFunction) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		action(ws.dbAdapter, w, r)
 	}

@@ -19,10 +19,6 @@ type ResponseCreateAccount struct {
 	AccountID string `json:"account_id"`
 }
 
-type ResponseErrorCreateAccount struct {
-	Error string `json:"error"`
-}
-
 func CreateAccount(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
 	var body CreateAccountBody
 	responder := NewResponder(w)
@@ -34,7 +30,7 @@ func CreateAccount(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&body)
 
 	if err != nil {
-		reponseError := ResponseErrorCreateAccount{Error: err.Error()}
+		reponseError := ResponseError{Error: err.Error()}
 		responder.badRequest(reponseError)
 		return
 	}
@@ -44,8 +40,14 @@ func CreateAccount(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
 	account, err := useCase.Handle(document)
 
 	if err != nil {
-		reponseError := ResponseErrorCreateAccount{Error: err.Error()}
-		responder.internalServerError(reponseError)
+		reponseError := ResponseError{Error: err.Error()}
+		switch err.(type) {
+		case model.DomainError:
+			responder.badRequest(reponseError)
+		default:
+			responder.internalServerError(reponseError)
+		}
+
 		return
 	}
 

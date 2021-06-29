@@ -16,13 +16,23 @@ func NewCreateAccountUseCase(service service.AccountService) *createAcUsecase {
 }
 
 func (usecase *createAcUsecase) Handle(document model.Document) (model.Account, error) {
-	account := model.NewAccount(document)
-
-	err := usecase.service.CreateAccount(account)
+	account, err := usecase.service.FindAccountByDocumentNumber(document)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return account, nil
+	if account != nil {
+		return nil, model.NewDomainError("account already exists")
+	}
+
+	newAccount := model.NewAccount(document)
+
+	createAccountError := usecase.service.CreateAccount(newAccount)
+
+	if createAccountError != nil {
+		return nil, createAccountError
+	}
+
+	return newAccount, nil
 }

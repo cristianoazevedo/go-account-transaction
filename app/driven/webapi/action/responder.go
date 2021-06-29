@@ -9,6 +9,10 @@ type responder struct {
 	rw http.ResponseWriter
 }
 
+type ResponseError struct {
+	Error string `json:"error"`
+}
+
 func NewResponder(rw http.ResponseWriter) *responder {
 	return &responder{rw: rw}
 }
@@ -39,4 +43,8 @@ func (responder *responder) internalServerError(payload interface{}) {
 
 func (responder *responder) badRequest(payload interface{}) {
 	responder.withJSON(http.StatusBadRequest, payload)
+}
+
+func (responder *responder) Forbidden(payload interface{}) {
+	responder.withJSON(http.StatusForbidden, payload)
 }

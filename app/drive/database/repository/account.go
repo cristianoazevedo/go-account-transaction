@@ -13,10 +13,27 @@ type accountRepository struct {
 
 type AcccountRepository interface {
 	CreateAccount(account model.Account) error
+	FindAccountByDocumentNumber(document model.Document) (model.Account, error)
 }
 
 func NewAccountRepository(adapter *sql.DB) *accountRepository {
 	return &accountRepository{dbAdapter: adapter}
+}
+
+func (repository *accountRepository) FindAccountByDocumentNumber(document model.Document) (model.Account, error) {
+	query := repository.dbAdapter.QueryRow("SELECT id, document_number, created_at FROM accounts where document_number= ?", document.GetValue())
+
+	var id, documentNumber, createAt string
+
+	err := query.Scan(&id, &documentNumber, &createAt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	account := model.BuildAccount(id, documentNumber, createAt)
+
+	return account, nil
 }
 
 func (repository *accountRepository) CreateAccount(account model.Account) error {

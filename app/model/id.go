@@ -16,6 +16,10 @@ func NewID() *id {
 	return &id{value: value.String()}
 }
 
+func BuildId(value string) *id {
+	return &id{value: value}
+}
+
 func (id *id) GetValue() string {
 	return id.value
 }

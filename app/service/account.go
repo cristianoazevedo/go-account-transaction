@@ -10,7 +10,8 @@ type accountService struct {
 }
 
 type AccountService interface {
-	CreateAccount(model.Account) error
+	CreateAccount(account model.Account) error
+	FindAccountByDocumentNumber(document model.Document) (model.Account, error)
 }
 
 func NewAccountService(repository repository.AcccountRepository) *accountService {
@@ -19,12 +20,10 @@ func NewAccountService(repository repository.AcccountRepository) *accountService
 	}
 }
 
+func (service *accountService) FindAccountByDocumentNumber(document model.Document) (model.Account, error) {
+	return service.repository.FindAccountByDocumentNumber(document)
+}
+
 func (service *accountService) CreateAccount(account model.Account) error {
-	err := service.repository.CreateAccount(account)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return service.repository.CreateAccount(account)
 }
