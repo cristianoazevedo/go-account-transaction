@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  mysql57:
+    container_name: mysql57
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: xpto
+      MYSQL_ROOT_PASSWORD: dev
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./migrations:/migrations
+
+  account-transaction:
+    container_name: account-transaction
+    build:
+      context: .
+      dockerfile: Dockerfile
+      network: host
+      target: dev
+    ports:
+      - 3001:3001
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    depends_on:
+      - mysql57
+    links:
+      - mysql57
