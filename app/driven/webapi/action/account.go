@@ -9,7 +9,17 @@ import (
 	"github.com/csazevedo/go-account-transaction/app/model"
 	"github.com/csazevedo/go-account-transaction/app/service"
 	"github.com/csazevedo/go-account-transaction/app/usecases"
+	"github.com/google/logger"
 )
+
+type accountAction struct {
+	dbAdapter  *sql.DB
+	logAdapter *logger.Logger
+}
+
+func NewAccountAction(dbAdapter *sql.DB, logAdapter *logger.Logger) *accountAction {
+	return &accountAction{dbAdapter: dbAdapter, logAdapter: logAdapter}
+}
 
 type CreateAccountBody struct {
 	DocumentNumber string `json:"document_number"`
@@ -19,10 +29,10 @@ type ResponseCreateAccount struct {
 	AccountID string `json:"account_id"`
 }
 
-func CreateAccount(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
+func (action *accountAction) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var body CreateAccountBody
 	responder := NewResponder(w)
-	repository := repository.NewAccountRepository(dbAdapter)
+	repository := repository.NewAccountRepository(action.dbAdapter)
 	service := service.NewAccountService(repository)
 
 	useCase := usecases.NewCreateAccountUseCase(service)
@@ -30,6 +40,7 @@ func CreateAccount(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&body)
 
 	if err != nil {
+		action.logAdapter.Errorf("error to parse body: %s", err.Error())
 		reponseError := ResponseError{Error: err.Error()}
 		responder.badRequest(reponseError)
 		return
@@ -37,17 +48,19 @@ func CreateAccount(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	document := model.NewDocument(body.DocumentNumber)
 
-	account, err := useCase.Handle(document)
+	account, domainError, infraError := useCase.Handle(document)
 
-	if err != nil {
-		reponseError := ResponseError{Error: err.Error()}
-		switch err.(type) {
-		case model.DomainError:
-			responder.badRequest(reponseError)
-		default:
-			responder.internalServerError(reponseError)
-		}
+	if domainError != nil {
+		action.logAdapter.Errorf("Error to create account: %s", domainError.Error())
+		reponseError := ResponseError{Error: domainError.Error()}
+		responder.badRequest(reponseError)
+		return
+	}
 
+	if infraError != nil {
+		action.logAdapter.Errorf("Error to create account: %s", infraError.Error())
+		reponseError := ResponseError{Error: infraError.Error()}
+		responder.internalServerError(reponseError)
 		return
 	}
 
@@ -56,7 +69,7 @@ func CreateAccount(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
 	responder.created(responseCreateAccount)
 }
 
-func GetAccount(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
+func (action *accountAction) GetAccount(w http.ResponseWriter, r *http.Request) {
 	responder := NewResponder(w)
 	health := map[string]string{}
 	health["foo"] = "bar"

@@ -10,10 +10,10 @@ configure:
 build:
 	- ${DOCKER_RUN} go build -a -o main .
 
-code-review:up
-	-  ${DOCKER_APP_EXC} go vet ./
-	-  ${DOCKER_APP_EXC} golint ./...
-	-  ${DOCKER_APP_EXC} errcheck -blank ./...
+code-review: up
+	- ${DOCKER_APP_EXC} go vet ./
+	- ${DOCKER_APP_EXC} golint ./...
+	- ${DOCKER_APP_EXC} errcheck -blank ./...
 
 up:
 	- docker-compose up -d
@@ -23,3 +23,6 @@ down:
 
 migrate: up
 	- ${DOCKER_MYSQL_EXC} sh -c "mysql --user=root -p xpto < migrations/xpto.sql"
+
+log:
+	- docker logs -f account-transaction

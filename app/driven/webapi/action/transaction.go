@@ -5,7 +5,15 @@ import (
 	"net/http"
 )
 
-func CreateTransaction(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
+type transactionAction struct {
+	dbAdapter *sql.DB
+}
+
+func NewTransactionAction(dbAdapter *sql.DB) *transactionAction {
+	return &transactionAction{dbAdapter: dbAdapter}
+}
+
+func (action *transactionAction) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	responder := NewResponder(w)
 	health := map[string]string{}
 	health["foo"] = "bar"

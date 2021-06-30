@@ -23,6 +23,8 @@ services:
       dockerfile: Dockerfile
       network: host
       target: dev
+    logging:
+      driver: syslog
     ports:
       - 3001:3001
     volumes:

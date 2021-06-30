@@ -1,11 +1,16 @@
 package action
 
 import (
-	"database/sql"
 	"net/http"
 )
 
-func Health(dbAdapter *sql.DB, w http.ResponseWriter, r *http.Request) {
+type healthAction struct{}
+
+func NewHealthAction() *healthAction {
+	return &healthAction{}
+}
+
+func (action *healthAction) Health(w http.ResponseWriter, r *http.Request) {
 	responder := NewResponder(w)
 	health := map[string]bool{}
 	health["alive"] = true

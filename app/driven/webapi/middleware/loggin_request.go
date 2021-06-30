@@ -1,22 +1,22 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
+
+	"github.com/google/logger"
 )
 
-type logger struct {
+type loggerRequest struct {
+	logAdapter *logger.Logger
 }
 
-func NewLogger() *logger {
-	return &logger{}
+func NewLoggerRequest(logAdapter *logger.Logger) *loggerRequest {
+	return &loggerRequest{logAdapter: logAdapter}
 }
 
-func (logger *logger) Middleware(next http.Handler) http.Handler {
+func (lr *loggerRequest) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Do stuff here
-		log.Println(r.RequestURI)
-		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		lr.logAdapter.Infof("Request URI %s", r.RequestURI)
 		next.ServeHTTP(w, r)
 	})
 }

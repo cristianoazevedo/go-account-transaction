@@ -21,11 +21,15 @@ func NewAccountRepository(adapter *sql.DB) *accountRepository {
 }
 
 func (repository *accountRepository) FindAccountByDocumentNumber(document model.Document) (model.Account, error) {
-	query := repository.dbAdapter.QueryRow("SELECT id, document_number, created_at FROM accounts where document_number= ?", document.GetValue())
+	query := repository.dbAdapter.QueryRow("SELECT id, document_number, created_at FROM accounts where document_number = ?", document.GetValue())
 
 	var id, documentNumber, createAt string
 
 	err := query.Scan(&id, &documentNumber, &createAt)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
 
 	if err != nil {
 		return nil, err

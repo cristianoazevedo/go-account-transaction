@@ -6,7 +6,8 @@ import (
 )
 
 func main() {
-	app := app.New(config.GetConfig())
+	config := config.GetConfig()
+	app := app.New(config)
 
-	app.Run(":3001")
+	app.Run(config.App.Host)
 }
