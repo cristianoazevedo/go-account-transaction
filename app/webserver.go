@@ -35,7 +35,7 @@ func New(c *config.Config) *webserver {
 
 func (ws *webserver) routing() {
 	healthAction := action.NewHealthAction()
-	transactionAction := action.NewTransactionAction(ws.dbAdapter)
+	transactionAction := action.NewTransactionAction(ws.dbAdapter, ws.logAdapter)
 	accountAction := action.NewAccountAction(ws.dbAdapter, ws.logAdapter)
 
 	v1 := ws.router.PathPrefix("/v1").Subrouter()
@@ -52,7 +52,7 @@ func (ws *webserver) routing() {
 
 	accountRouter := v1.PathPrefix("/accounts").Subrouter()
 	accountRouter.HandleFunc("", ws.handleRequest(accountAction.CreateAccount)).Methods(http.MethodPost)
-	accountRouter.HandleFunc("/{id:[0-9]+}", ws.handleRequest(accountAction.GetAccount)).Methods(http.MethodGet)
+	accountRouter.HandleFunc("/{id:[a-z-0-9]+}", ws.handleRequest(accountAction.GetAccount)).Methods(http.MethodGet)
 	accountRouter.Use(
 		middleware.NewAuthorization(ws.logAdapter).Middleware,
 	)

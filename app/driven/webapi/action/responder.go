@@ -13,6 +13,10 @@ type ResponseError struct {
 	Error string `json:"error"`
 }
 
+type ResponseInfo struct {
+	Info string `json:"info"`
+}
+
 func NewResponder(rw http.ResponseWriter) *responder {
 	return &responder{rw: rw}
 }
@@ -29,20 +33,28 @@ func (responder *responder) withJSON(status int, payload interface{}) {
 	responder.rw.Write([]byte(response))
 }
 
-func (responder *responder) accepted(payload interface{}) {
+func (responder *responder) Accepted(payload interface{}) {
 	responder.withJSON(http.StatusAccepted, payload)
 }
 
-func (responder *responder) created(payload interface{}) {
+func (responder *responder) OK(payload interface{}) {
+	responder.withJSON(http.StatusOK, payload)
+}
+
+func (responder *responder) Created(payload interface{}) {
 	responder.withJSON(http.StatusCreated, payload)
 }
 
-func (responder *responder) internalServerError(payload interface{}) {
+func (responder *responder) InternalServerError(payload interface{}) {
 	responder.withJSON(http.StatusInternalServerError, payload)
 }
 
-func (responder *responder) badRequest(payload interface{}) {
+func (responder *responder) BadRequest(payload interface{}) {
 	responder.withJSON(http.StatusBadRequest, payload)
+}
+
+func (responder *responder) NotFound(payload interface{}) {
+	responder.withJSON(http.StatusNotFound, payload)
 }
 
 func (responder *responder) Forbidden(payload interface{}) {

@@ -14,6 +14,7 @@ type accountRepository struct {
 type AcccountRepository interface {
 	CreateAccount(account model.Account) error
 	FindAccountByDocumentNumber(document model.Document) (model.Account, error)
+	FindByID(idAccount model.ID) (model.Account, error)
 }
 
 func NewAccountRepository(adapter *sql.DB) *accountRepository {
@@ -21,7 +22,19 @@ func NewAccountRepository(adapter *sql.DB) *accountRepository {
 }
 
 func (repository *accountRepository) FindAccountByDocumentNumber(document model.Document) (model.Account, error) {
-	query := repository.dbAdapter.QueryRow("SELECT id, document_number, created_at FROM accounts where document_number = ?", document.GetValue())
+	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
+
+	return repository.find(query, document.GetValue())
+}
+
+func (repository *accountRepository) FindByID(idAccount model.ID) (model.Account, error) {
+	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+
+	return repository.find(query, idAccount.GetValue())
+}
+
+func (repository *accountRepository) find(queryString string, args ...interface{}) (model.Account, error) {
+	query := repository.dbAdapter.QueryRow(queryString, args...)
 
 	var id, documentNumber, createAt string
 
@@ -35,7 +48,11 @@ func (repository *accountRepository) FindAccountByDocumentNumber(document model.
 		return nil, err
 	}
 
-	account := model.BuildAccount(id, documentNumber, createAt)
+	account, err := model.BuildAccount(id, documentNumber, createAt)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return account, nil
 }

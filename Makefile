@@ -10,6 +10,9 @@ configure:
 build:
 	- ${DOCKER_RUN} go build -a -o main .
 
+test:
+	- ${DOCKER_RUN} go test -coverprofile cover.out -v ./... && go tool cover -html=cover.out -o cover.html
+
 code-review: up
 	- ${DOCKER_APP_EXC} go vet ./
 	- ${DOCKER_APP_EXC} golint ./...

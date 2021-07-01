@@ -1,21 +1,51 @@
 package model
 
 type transaction struct {
-	id            *id
-	account       account
+	id            ID
+	account       Account
 	operationType OperationType
-	amount        amount
-	eventDate     date
+	amount        Amount
+	eventDate     Date
 }
 
-func NewTransaction(account account) *transaction {
+type Transaction interface {
+	GetId() ID
+	GetAccount() Account
+	GetOperationType() OperationType
+	GetAmount() Amount
+	GetAmountValueByOperationType() float64
+}
+
+func NewTransaction(account Account, operationType OperationType, amount Amount) *transaction {
 	return &transaction{
 		id:            NewID(),
 		account:       account,
-		operationType: 0,
-		amount: amount{
-			value: 0,
-		},
-		eventDate: date{},
+		operationType: operationType,
+		amount:        amount,
+		eventDate:     NewDate("now"),
 	}
+}
+
+func (transaction *transaction) GetId() ID {
+	return transaction.id
+}
+
+func (transaction *transaction) GetAccount() Account {
+	return transaction.account
+}
+
+func (transaction *transaction) GetOperationType() OperationType {
+	return transaction.operationType
+}
+
+func (transaction *transaction) GetAmount() Amount {
+	return transaction.amount
+}
+
+func (transaction *transaction) GetAmountValueByOperationType() float64 {
+	if transaction.operationType.GetValue() != Payment {
+		return transaction.amount.GetValue() * -1
+	}
+
+	return transaction.amount.GetValue()
 }

@@ -12,7 +12,7 @@ func NewHealthAction() *healthAction {
 
 func (action *healthAction) Health(w http.ResponseWriter, r *http.Request) {
 	responder := NewResponder(w)
-	health := map[string]bool{}
-	health["alive"] = true
-	responder.accepted(health)
+	response := ResponseInfo{Info: "alive"}
+
+	responder.Accepted(response)
 }

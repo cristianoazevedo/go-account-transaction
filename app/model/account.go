@@ -20,8 +20,22 @@ func NewAccount(document Document) *account {
 	}
 }
 
-func BuildAccount(id string, document string, createdAt string) *account {
-	return &account{id: BuildId(id), document: NewDocument(document), createdAt: NewDate(createdAt)}
+func BuildAccount(id string, document string, createdAt string) (*account, error) {
+	idBuilded, err := BuildId(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	newDocument, err := NewDocument(document)
+
+	if err != nil {
+		return nil, err
+	}
+
+	NewDocument(document)
+
+	return &account{id: idBuilded, document: newDocument, createdAt: NewDate(createdAt)}, nil
 }
 
 func (account *account) GetId() ID {

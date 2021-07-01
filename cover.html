@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/csazevedo/go-account-transaction/app/model/account.go (0.0%)</option>
+				
+				<option value="file1">github.com/csazevedo/go-account-transaction/app/model/amount.go (0.0%)</option>
+				
+				<option value="file2">github.com/csazevedo/go-account-transaction/app/model/date.go (0.0%)</option>
+				
+				<option value="file3">github.com/csazevedo/go-account-transaction/app/model/document_number.go (0.0%)</option>
+				
+				<option value="file4">github.com/csazevedo/go-account-transaction/app/model/error.go (0.0%)</option>
+				
+				<option value="file5">github.com/csazevedo/go-account-transaction/app/model/id.go (0.0%)</option>
+				
+				<option value="file6">github.com/csazevedo/go-account-transaction/app/model/operation_type.go (50.0%)</option>
+				
+				<option value="file7">github.com/csazevedo/go-account-transaction/app/model/transaction.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package model
+
+type account struct {
+        id        ID
+        createdAt Date
+        document  Document
+}
+
+type Account interface {
+        GetId() ID
+        GetDocument() Document
+        GetCreatedAt() Date
+}
+
+func NewAccount(document Document) *account <span class="cov0" title="0">{
+        return &amp;account{
+                id:        NewID(),
+                createdAt: NewDate("today"),
+                document:  document,
+        }
+}</span>
+
+func BuildAccount(id string, document string, createdAt string) (*account, error) <span class="cov0" title="0">{
+        idBuilded, err := BuildId(id)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">newDocument, err := NewDocument(document)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">NewDocument(document)
+
+        return &amp;account{id: idBuilded, document: newDocument, createdAt: NewDate(createdAt)}, nil</span>
+}
+
+func (account *account) GetId() ID <span class="cov0" title="0">{
+        return account.id
+}</span>
+
+func (account *account) GetDocument() Document <span class="cov0" title="0">{
+        return account.document
+}</span>
+
+func (account *account) GetCreatedAt() Date <span class="cov0" title="0">{
+        return account.createdAt
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package model
+
+import "math"
+
+type amount struct {
+        value float64
+}
+
+type Amount interface {
+        GetValue() float64
+}
+
+func NewAmount(value float64) (*amount, error) <span class="cov0" title="0">{
+        if value &lt;= 0 || value &gt; math.MaxFloat64 </span><span class="cov0" title="0">{
+                return nil, NewDomainError("amount not allowed")
+        }</span>
+
+        <span class="cov0" title="0">return &amp;amount{value: value}, nil</span>
+}
+
+func (amount *amount) GetValue() float64 <span class="cov0" title="0">{
+        return amount.value
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package model
+
+type date struct {
+        value string
+}
+
+type Date interface {
+        GetValue() string
+}
+
+func NewDate(value string) *date <span class="cov0" title="0">{
+        return &amp;date{
+                value: value,
+        }
+}</span>
+
+func (date *date) GetValue() string <span class="cov0" title="0">{
+        return date.value
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package model
+
+import "github.com/Nhanderu/brdoc"
+
+type document struct {
+        value string
+}
+
+func NewDocument(value string) (*document, error) <span class="cov0" title="0">{
+        if !brdoc.IsCPF(value) </span><span class="cov0" title="0">{
+                return nil, NewDomainError("Document invalid")
+        }</span>
+
+        <span class="cov0" title="0">return &amp;document{value: value}, nil</span>
+}
+
+type Document interface {
+        GetValue() string
+}
+
+func (document *document) GetValue() string <span class="cov0" title="0">{
+        return document.value
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package model
+
+type domainError struct {
+        err string
+}
+
+type infraError struct {
+        err string
+}
+
+type DomainError interface {
+        Error() string
+}
+
+type InfraError interface {
+        Error() string
+}
+
+func NewDomainError(message string) *domainError <span class="cov0" title="0">{
+        return &amp;domainError{err: message}
+}</span>
+
+func NewInfraError(message string) *infraError <span class="cov0" title="0">{
+        return &amp;infraError{err: message}
+}</span>
+
+func (domainError *domainError) Error() string <span class="cov0" title="0">{
+        return domainError.err
+}</span>
+
+func (infraError *infraError) Error() string <span class="cov0" title="0">{
+        return infraError.err
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package model
+
+import "github.com/google/uuid"
+
+type id struct {
+        value string
+}
+
+type ID interface {
+        GetValue() string
+}
+
+func NewID() *id <span class="cov0" title="0">{
+        value, _ := uuid.NewRandom()
+
+        return &amp;id{value: value.String()}
+}</span>
+
+func BuildId(value string) (*id, error) <span class="cov0" title="0">{
+        valueParsed, err := uuid.Parse(value)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;id{value: valueParsed.String()}, nil</span>
+}
+
+func (id *id) GetValue() string <span class="cov0" title="0">{
+        return id.value
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package model
+
+type operationType struct {
+        value int
+}
+
+const (
+        CashPurchase = iota + 1
+        PurchaseParceled
+        Withdraw
+        Payment
+)
+
+type OperationType interface {
+        GetValue() int
+}
+
+func NewOperationType(value int) (*operationType, error) <span class="cov8" title="1">{
+        if value &lt; CashPurchase || value &gt; Payment </span><span class="cov0" title="0">{
+                return nil, NewDomainError("Operation type invaild")
+        }</span>
+
+        <span class="cov8" title="1">return &amp;operationType{value: value}, nil</span>
+}
+
+func (operationType *operationType) GetValue() int <span class="cov0" title="0">{
+        return operationType.value
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package model
+
+type transaction struct {
+        id            ID
+        account       Account
+        operationType OperationType
+        amount        Amount
+        eventDate     Date
+}
+
+type Transaction interface {
+        GetId() ID
+        GetAccount() Account
+        GetOperationType() OperationType
+        GetAmount() Amount
+        GetAmountValueByOperationType() float64
+}
+
+func NewTransaction(account Account, operationType OperationType, amount Amount) *transaction <span class="cov0" title="0">{
+        return &amp;transaction{
+                id:            NewID(),
+                account:       account,
+                operationType: operationType,
+                amount:        amount,
+                eventDate:     NewDate("now"),
+        }
+}</span>
+
+func (transaction *transaction) GetId() ID <span class="cov0" title="0">{
+        return transaction.id
+}</span>
+
+func (transaction *transaction) GetAccount() Account <span class="cov0" title="0">{
+        return transaction.account
+}</span>
+
+func (transaction *transaction) GetOperationType() OperationType <span class="cov0" title="0">{
+        return transaction.operationType
+}</span>
+
+func (transaction *transaction) GetAmount() Amount <span class="cov0" title="0">{
+        return transaction.amount
+}</span>
+
+func (transaction *transaction) GetAmountValueByOperationType() float64 <span class="cov0" title="0">{
+        if transaction.operationType.GetValue() != Payment </span><span class="cov0" title="0">{
+                return transaction.amount.GetValue() * -1
+        }</span>
+
+        <span class="cov0" title="0">return transaction.amount.GetValue()</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

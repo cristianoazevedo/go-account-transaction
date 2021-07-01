@@ -22,11 +22,19 @@ func (authorization *authorization) Middleware(next http.Handler) http.Handler {
 
 		if authorization.auth == authorizationHeader {
 			next.ServeHTTP(w, r)
-		} else {
-			authorization.logAdapter.Infoln("authorization invalid: %s", authorizationHeader)
-			responder := action.NewResponder(w)
-			reponseError := action.ResponseError{Error: "authorization invalid"}
-			responder.Forbidden(reponseError)
+			return
 		}
+
+		responder := action.NewResponder(w)
+
+		if authorizationHeader == "" {
+			response := action.ResponseInfo{Info: "authorization missing"}
+			responder.BadRequest(response)
+			return
+		}
+
+		authorization.logAdapter.Infof("Authorization invalid: %s", authorizationHeader)
+		reponseError := action.ResponseError{Error: "authorization invalid"}
+		responder.Forbidden(reponseError)
 	})
 }

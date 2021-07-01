@@ -5,7 +5,6 @@ import "os"
 type Config struct {
 	App      *AppConfig
 	DBConfig *DBConfig
-	Log      *LogConfig
 }
 
 type DBConfig struct {
@@ -13,10 +12,6 @@ type DBConfig struct {
 	Host string
 	User string
 	Pwd  string
-}
-
-type LogConfig struct {
-	PathName string
 }
 
 type AppConfig struct {
@@ -35,9 +30,6 @@ func GetConfig() *Config {
 			Host: os.Getenv("DB_HOST"),
 			User: os.Getenv("DB_USER"),
 			Pwd:  os.Getenv("DB_PASS"),
-		},
-		Log: &LogConfig{
-			PathName: os.Getenv("LOG_PATH"),
 		},
 	}
 }

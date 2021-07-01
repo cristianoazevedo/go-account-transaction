@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `transactions` (
     `id` VARCHAR(36) NOT NULL,
     `account_id` VARCHAR(36) NOT NULL,
     `operation_type` ENUM('1', '2', '3', '4') NOT NULL,
-    `amount` VARCHAR(11) NOT NULL,
+    `amount` DECIMAL(13,2) NOT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`account_id`)

@@ -16,8 +16,14 @@ func NewID() *id {
 	return &id{value: value.String()}
 }
 
-func BuildId(value string) *id {
-	return &id{value: value}
+func BuildId(value string) (*id, error) {
+	valueParsed, err := uuid.Parse(value)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &id{value: valueParsed.String()}, nil
 }
 
 func (id *id) GetValue() string {
