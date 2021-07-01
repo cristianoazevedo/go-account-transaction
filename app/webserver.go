@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/csazevedo/go-account-transaction/app/drive/database"
-	logbook "github.com/csazevedo/go-account-transaction/app/drive/log"
-	"github.com/csazevedo/go-account-transaction/app/driven/webapi/action"
-	"github.com/csazevedo/go-account-transaction/app/driven/webapi/middleware"
+	"github.com/csazevedo/go-account-transaction/app/driven/database"
+	logbook "github.com/csazevedo/go-account-transaction/app/driven/log"
+	"github.com/csazevedo/go-account-transaction/app/driver/webapi/action"
+	"github.com/csazevedo/go-account-transaction/app/driver/webapi/middleware"
 	"github.com/csazevedo/go-account-transaction/config"
 	"github.com/google/logger"
 

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/csazevedo/go-account-transaction/app/drive/database/repository"
+	"github.com/csazevedo/go-account-transaction/app/driven/database/repository"
 	"github.com/csazevedo/go-account-transaction/app/service"
 	"github.com/csazevedo/go-account-transaction/app/usecases"
 	"github.com/google/logger"

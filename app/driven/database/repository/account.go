@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"database/sql"
 
 	"github.com/csazevedo/go-account-transaction/app/model"
@@ -57,34 +56,22 @@ func (repository *accountRepository) find(queryString string, args ...interface{
 	return account, nil
 }
 
-func (repository *accountRepository) CreateAccount(account model.Account) error {
-	ctx := context.Background()
-
-	transaction, err := repository.dbAdapter.BeginTx(ctx, nil)
+func (repository *accountRepository) CreateAccount(account model.Account) (err error) {
+	tx, err := repository.dbAdapter.Begin()
 
 	if err != nil {
-		return err
+		return
 	}
 
-	insert, err := repository.dbAdapter.Prepare("INSERT INTO accounts(id, document_number) VALUES(?,?)")
+	_, err = tx.Exec("INSERT INTO accounts(id, document_number) VALUES(?, ?)", account.GetId().GetValue(), account.GetDocument().GetValue())
 
 	if err != nil {
-		return err
+		tx.Rollback()
+
+		return
 	}
 
-	_, err = insert.ExecContext(ctx, account.GetId().GetValue(), account.GetDocument().GetValue())
+	err = tx.Commit()
 
-	if err != nil {
-		transaction.Rollback()
-
-		return err
-	}
-
-	err = transaction.Commit()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return
 }

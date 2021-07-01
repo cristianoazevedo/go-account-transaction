@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"database/sql"
 
 	"github.com/csazevedo/go-account-transaction/app/model"
@@ -19,25 +18,15 @@ func NewTransactionRepository(adapter *sql.DB) *transactionRepository {
 	return &transactionRepository{dbAdapter: adapter}
 }
 
-func (repository *transactionRepository) CreateTransaction(transaction model.Transaction) error {
-	ctx := context.Background()
-
-	dbTransaction, err := repository.dbAdapter.BeginTx(ctx, nil)
+func (repository *transactionRepository) CreateTransaction(transaction model.Transaction) (err error) {
+	tx, err := repository.dbAdapter.Begin()
 
 	if err != nil {
-		return err
+		return
 	}
 
-	query := "INSERT INTO transactions(id, account_id, operation_type, amount) VALUES(?,?,?,?)"
-
-	insert, err := repository.dbAdapter.Prepare(query)
-
-	if err != nil {
-		return err
-	}
-
-	_, err = insert.ExecContext(
-		ctx,
+	_, err = tx.Exec(
+		"INSERT INTO transactions(id, account_id, operation_type, amount) VALUES(?,?,?,?)",
 		transaction.GetId().GetValue(),
 		transaction.GetAccount().GetId().GetValue(),
 		transaction.GetOperationType().GetValue(),
@@ -45,16 +34,12 @@ func (repository *transactionRepository) CreateTransaction(transaction model.Tra
 	)
 
 	if err != nil {
-		dbTransaction.Rollback()
+		tx.Rollback()
 
-		return err
+		return
 	}
 
-	err = dbTransaction.Commit()
+	err = tx.Commit()
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return
 }

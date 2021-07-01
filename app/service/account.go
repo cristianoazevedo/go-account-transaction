@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/csazevedo/go-account-transaction/app/drive/database/repository"
+	"github.com/csazevedo/go-account-transaction/app/driven/database/repository"
 	"github.com/csazevedo/go-account-transaction/app/model"
 )
 

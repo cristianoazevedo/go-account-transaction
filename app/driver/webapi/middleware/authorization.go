@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/csazevedo/go-account-transaction/app/driven/webapi/action"
+	"github.com/csazevedo/go-account-transaction/app/driver/webapi/action"
 	"github.com/google/logger"
 )
 

@@ -33,8 +33,6 @@ func BuildAccount(id string, document string, createdAt string) (*account, error
 		return nil, err
 	}
 
-	NewDocument(document)
-
 	return &account{id: idBuilded, document: newDocument, createdAt: NewDate(createdAt)}, nil
 }
 

@@ -43,9 +43,9 @@ func (transaction *transaction) GetAmount() Amount {
 }
 
 func (transaction *transaction) GetAmountValueByOperationType() float64 {
-	if transaction.operationType.GetValue() != Payment {
-		return transaction.amount.GetValue() * -1
+	if transaction.operationType.GetValue() == Payment {
+		return transaction.amount.GetValue()
 	}
 
-	return transaction.amount.GetValue()
+	return transaction.amount.GetValue() * -1
 }

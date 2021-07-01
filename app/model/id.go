@@ -11,9 +11,7 @@ type ID interface {
 }
 
 func NewID() *id {
-	value, _ := uuid.NewRandom()
-
-	return &id{value: value.String()}
+	return &id{value: uuid.New().String()}
 }
 
 func BuildId(value string) (*id, error) {

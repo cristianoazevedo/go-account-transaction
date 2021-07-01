@@ -1,4 +1,4 @@
-DOCKER_RUN=docker run --rm -it --network host -v /etc/resolv.conf:/etc/resolv.conf -v ${PWD}:/app -w /app golang:1.16-stretch
+DOCKER_RUN=docker run --rm -it --network host -v /etc/resolv.conf:/etc/resolv.conf -v ${PWD}:/app -w /app golang:1.16-buster
 DOCKER_APP_EXC=docker exec account-transaction
 DOCKER_MYSQL_EXC=docker exec -it mysql57
 
@@ -11,7 +11,7 @@ build:
 	- ${DOCKER_RUN} go build -a -o main .
 
 test:
-	- ${DOCKER_RUN} go test -coverprofile cover.out -v ./... && go tool cover -html=cover.out -o ./report/cover.html
+	- ${DOCKER_RUN} go test -coverprofile cover.out -v ./app/... && go tool cover -html=cover.out -o cover.html
 
 code-review: up
 	- ${DOCKER_APP_EXC} go vet ./
