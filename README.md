@@ -77,7 +77,7 @@ To test API use this authorization:
 | Endpoint | Method |
 | :------------ | :------------ |
 | /v1/accounts | POST |
-| /v1/account/:account-id | GET |
+| /v1/accounts/:account-id | GET |
 | /v1/transaction| POST |
 
 
@@ -95,7 +95,7 @@ Example:
     "document_number": "49330192076"
 }
 ```
-Response: Status: 200 OK
+Response: Status 201 Created
 ```json
 {
     "account_id": "30e11b25-89a3-403d-af06-26a837563c55"
@@ -111,7 +111,7 @@ curl --location --request POST 'http://localhost:3001/v1/accounts' \
 }'
 ```
 ### Querying an account's information [GET /:account-id]
-Response: Status: 200 OK
+Response: Status 200 OK
 ```json
 {
     "account_id": "3e0147b4-b777-4994-be9c-921361d8c06d",
@@ -122,7 +122,7 @@ Response: Status: 200 OK
 ------------
 
 
-# Transaction [/transaction]
+# Transactions [/transactions]
 ### Creating a transaction [POST]
 Body:
 
@@ -140,13 +140,13 @@ Example:
     "amount": 10.01
 }
 ```
-Response: Status: 201 Created
+Response: Status 201 Created
 ```json
 {
     "transaction_id": "5cd6f148-1e26-40f8-b4fc-b17dc98b1da1"
 }
 ```
-Request example using cURl:
+Request example using cURL:
 ```shell
 curl --location --request POST 'http://localhost:3001/v1/transactions' \
 --header 'Authorization: 0c7ee5a41bff7c8af4d4ff3740b0224d' \
