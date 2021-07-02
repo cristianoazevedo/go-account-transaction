@@ -12,10 +12,12 @@ type authorization struct {
 	logAdapter *logger.Logger
 }
 
+//NewAuthorization creates a new struct of authorization middleware
 func NewAuthorization(logAdapter *logger.Logger) *authorization {
 	return &authorization{auth: "0c7ee5a41bff7c8af4d4ff3740b0224d", logAdapter: logAdapter}
 }
 
+//Middleware authorization middleware handler
 func (authorization *authorization) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authorizationHeader := r.Header.Get("Authorization")

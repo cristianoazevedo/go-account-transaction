@@ -23,9 +23,13 @@ type webserver struct {
 
 type handleRequestFunction func(dw http.ResponseWriter, r *http.Request)
 
+//New bootstrap of application
+//Defines application routes
+//Create a database connection
+//Set the log
 func New(c *config.Config) *webserver {
 	router := mux.NewRouter()
-	dbAdapeter := database.NewMySqlConnection(c.DBConfig)
+	dbAdapeter := database.NewMySQLConnection(c.DBConfig)
 	logAdapter := logbook.NewLogger()
 	ws := &webserver{router: router, dbAdapter: dbAdapeter, logAdapter: logAdapter}
 	ws.routing()
@@ -64,6 +68,7 @@ func (ws *webserver) handleRequest(handle handleRequestFunction) http.HandlerFun
 	}
 }
 
+//Run start webserver
 func (ws *webserver) Run(host string) {
 	srv := &http.Server{
 		Addr:         host,

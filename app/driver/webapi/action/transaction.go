@@ -22,14 +22,16 @@ type createTransactionBoby struct {
 	Amount        float64 `json:"amount"`
 }
 
-type ResponseTransaction struct {
+type responseTransaction struct {
 	TransactionID string `json:"transaction_id"`
 }
 
+//NewTransactionAction creates a new struct of trasction action
 func NewTransactionAction(dbAdapter *sql.DB, logAdapter *logger.Logger) *transactionAction {
 	return &transactionAction{dbAdapter: dbAdapter, logAdapter: logAdapter}
 }
 
+//CreateAccount action responsible for receiving a request and creating an transaction
 func (action *transactionAction) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	var body createTransactionBoby
 	responder := NewResponder(w)
@@ -67,7 +69,7 @@ func (action *transactionAction) CreateTransaction(w http.ResponseWriter, r *htt
 		return
 	}
 
-	response := ResponseTransaction{TransactionID: tranaction.GetId().GetValue()}
+	response := responseTransaction{TransactionID: tranaction.GetID().GetValue()}
 
 	responder.Created(response)
 }

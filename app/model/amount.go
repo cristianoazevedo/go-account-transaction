@@ -6,10 +6,13 @@ type amount struct {
 	value float64
 }
 
+//Amount interface representing the amount struct
 type Amount interface {
 	GetValue() float64
+	GetValueNegative() float64
 }
 
+//NewAmount create a new amount struct
 func NewAmount(value float64) (*amount, error) {
 	if value <= 0 || value > math.MaxFloat64 {
 		return nil, NewDomainError("amount not allowed")
@@ -18,6 +21,12 @@ func NewAmount(value float64) (*amount, error) {
 	return &amount{value: value}, nil
 }
 
+//GetValue returns the value of amount
 func (amount *amount) GetValue() float64 {
 	return amount.value
+}
+
+//GetValueNegative returns the negative value of amount
+func (amount *amount) GetValueNegative() float64 {
+	return amount.value * -1
 }

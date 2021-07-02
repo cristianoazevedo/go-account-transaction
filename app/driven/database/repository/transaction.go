@@ -10,14 +10,19 @@ type transactionRepository struct {
 	dbAdapter *sql.DB
 }
 
+//TransactionRepository interface representing the transaction repository struct
 type TransactionRepository interface {
 	CreateTransaction(transaction model.Transaction) error
 }
 
-func NewTransactionRepository(adapter *sql.DB) *transactionRepository {
+//NewTransactionRepository creates a new struct of transaction repository
+func NewTransactionRepository(adapter *sql.DB) TransactionRepository {
 	return &transactionRepository{dbAdapter: adapter}
 }
 
+//CreateTransaction create a transaction
+//As a critical point, the concept of transaction is used.
+//If there is any problem, no changes are made
 func (repository *transactionRepository) CreateTransaction(transaction model.Transaction) (err error) {
 	tx, err := repository.dbAdapter.Begin()
 
@@ -27,8 +32,8 @@ func (repository *transactionRepository) CreateTransaction(transaction model.Tra
 
 	_, err = tx.Exec(
 		"INSERT INTO transactions(id, account_id, operation_type, amount) VALUES(?,?,?,?)",
-		transaction.GetId().GetValue(),
-		transaction.GetAccount().GetId().GetValue(),
+		transaction.GetID().GetValue(),
+		transaction.GetAccount().GetID().GetValue(),
 		transaction.GetOperationType().GetValue(),
 		transaction.GetAmountValueByOperationType(),
 	)

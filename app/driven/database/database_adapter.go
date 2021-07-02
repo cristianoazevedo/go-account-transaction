@@ -8,7 +8,8 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-func NewMySqlConnection(config *config.DBConfig) *sql.DB {
+//NewMySQLConnection create a data base connection
+func NewMySQLConnection(config *config.DBConfig) *sql.DB {
 	mysqlConfig := mysql.NewConfig()
 	mysqlConfig.User = config.User
 	mysqlConfig.Passwd = config.Pwd
@@ -16,7 +17,7 @@ func NewMySqlConnection(config *config.DBConfig) *sql.DB {
 	mysqlConfig.DBName = config.Name
 	mysqlConfig.Net = "tcp"
 
-	db, err := sql.Open("mysql", mysqlConfig.FormatDSN())
+	db, err := sql.Open(config.Driver, mysqlConfig.FormatDSN())
 
 	if err != nil {
 		panic(err.Error())

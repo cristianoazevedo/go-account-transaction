@@ -5,7 +5,7 @@ import (
 )
 
 func TestNewTransactionValid(t *testing.T) {
-	values := []int{1, 2, 3, 4}
+	values := []int{1, 2, 3, 4} //operation types
 
 	for key, value := range values {
 		var id, account, operationType, amount interface{}
@@ -17,7 +17,7 @@ func TestNewTransactionValid(t *testing.T) {
 
 		transactionModel := NewTransaction(accountModel, operationTypeModel, amountModel)
 
-		id = transactionModel.GetId()
+		id = transactionModel.GetID()
 		account = transactionModel.GetAccount()
 		operationType = transactionModel.GetOperationType()
 		amount = transactionModel.GetAmount()
@@ -25,7 +25,7 @@ func TestNewTransactionValid(t *testing.T) {
 		amountByOperatonType = amountModel.GetValue()
 
 		if value != 4 {
-			amountByOperatonType = amountModel.GetValue() * -1
+			amountByOperatonType = amountModel.GetValueNegative()
 		}
 
 		if amountByOperatonType != transactionModel.GetAmountValueByOperationType() {

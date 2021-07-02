@@ -14,7 +14,7 @@ func TestNewAcccountValid(t *testing.T) {
 		var id, document, createdAt interface{}
 		documentNumberModel, _ := NewDocument(value)
 		accountModel := NewAccount(documentNumberModel)
-		id = accountModel.GetId()
+		id = accountModel.GetID()
 		document = accountModel.GetDocument()
 		createdAt = accountModel.GetCreatedAt()
 
@@ -58,7 +58,7 @@ func TestBuildAccountValid(t *testing.T) {
 			break
 		}
 
-		if accountModel.GetId().GetValue() != value.id {
+		if accountModel.GetID().GetValue() != value.id {
 			t.Errorf("\nTest at position [%d].\nInvalid ID value: '%v'", key, value.id)
 		}
 

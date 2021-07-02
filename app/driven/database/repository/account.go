@@ -16,16 +16,19 @@ type AcccountRepository interface {
 	FindByID(idAccount model.ID) (model.Account, error)
 }
 
-func NewAccountRepository(adapter *sql.DB) *accountRepository {
+//NewAccountRepository creates a new struct of acccount repository
+func NewAccountRepository(adapter *sql.DB) AcccountRepository {
 	return &accountRepository{dbAdapter: adapter}
 }
 
+//FindAccountByDocumentNumber find account by document number
 func (repository *accountRepository) FindAccountByDocumentNumber(document model.Document) (model.Account, error) {
 	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
 
 	return repository.find(query, document.GetValue())
 }
 
+//FindAccountByDocumentNumber find account by account ID
 func (repository *accountRepository) FindByID(idAccount model.ID) (model.Account, error) {
 	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
 
@@ -56,6 +59,9 @@ func (repository *accountRepository) find(queryString string, args ...interface{
 	return account, nil
 }
 
+//CreateAccount create an account
+//As a critical point, the concept of transaction is used.
+//If there is any problem, no changes are made
 func (repository *accountRepository) CreateAccount(account model.Account) (err error) {
 	tx, err := repository.dbAdapter.Begin()
 
@@ -63,7 +69,7 @@ func (repository *accountRepository) CreateAccount(account model.Account) (err e
 		return
 	}
 
-	_, err = tx.Exec("INSERT INTO accounts(id, document_number) VALUES(?, ?)", account.GetId().GetValue(), account.GetDocument().GetValue())
+	_, err = tx.Exec("INSERT INTO accounts(id, document_number) VALUES(?, ?)", account.GetID().GetValue(), account.GetDocument().GetValue())
 
 	if err != nil {
 		tx.Rollback()

@@ -26,7 +26,7 @@ func TestBuildIdValid(t *testing.T) {
 	}
 
 	for key, value := range values {
-		idModel, err := BuildId(value)
+		idModel, err := BuildID(value)
 
 		if err != nil {
 			t.Errorf("\nTest at position [%d].\nAn error '%s' was not expected", key, err)
@@ -51,7 +51,7 @@ func TestBuildIdInalid(t *testing.T) {
 	}
 
 	for key, value := range values {
-		_, err := BuildId(value)
+		_, err := BuildID(value)
 
 		if err == nil {
 			t.Errorf("\nTest at position [%d].\nExpected error", key)

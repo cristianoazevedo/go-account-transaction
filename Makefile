@@ -11,12 +11,11 @@ build:
 	- ${DOCKER_RUN} go build -a -o main .
 
 test:
-	- ${DOCKER_RUN} go test -coverprofile cover.out -v ./app/... && go tool cover -html=cover.out -o cover.html
+	- ${DOCKER_RUN} go test -coverprofile ./report/cover.out -v ./app/... && go tool cover -html=./report/cover.out -o ./report/cover.html
 
 code-review: up
-	- ${DOCKER_APP_EXC} go vet ./
-	- ${DOCKER_APP_EXC} golint ./...
-	- ${DOCKER_APP_EXC} errcheck -blank ./...
+	- ${DOCKER_APP_EXC} go vet ./app/...
+	- ${DOCKER_APP_EXC} golint ./app/...
 
 up:
 	- docker-compose up -d

@@ -17,6 +17,7 @@ type accountAction struct {
 	logAdapter *logger.Logger
 }
 
+//NewAccountAction creates a new struct of acccount action
 func NewAccountAction(dbAdapter *sql.DB, logAdapter *logger.Logger) *accountAction {
 	return &accountAction{dbAdapter: dbAdapter, logAdapter: logAdapter}
 }
@@ -25,11 +26,12 @@ type createAccountBody struct {
 	DocumentNumber string `json:"document_number"`
 }
 
-type ResponseAccount struct {
+type responseAccount struct {
 	AccountID      string `json:"account_id"`
 	DocumentNumber string `json:"document_number,omitempty"`
 }
 
+//CreateAccount action responsible for receiving a request and creating an account
 func (action *accountAction) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var body createAccountBody
 	responder := NewResponder(w)
@@ -64,11 +66,12 @@ func (action *accountAction) CreateAccount(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	response := ResponseAccount{AccountID: account.GetId().GetValue()}
+	response := responseAccount{AccountID: account.GetID().GetValue()}
 
 	responder.Created(response)
 }
 
+//CreateAccount action responsible for receiving a request and find an account
 func (action *accountAction) GetAccount(w http.ResponseWriter, r *http.Request) {
 	id, found := mux.Vars(r)["id"]
 
@@ -108,7 +111,7 @@ func (action *accountAction) GetAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	response := ResponseAccount{AccountID: account.GetId().GetValue(), DocumentNumber: account.GetDocument().GetValue()}
+	response := responseAccount{AccountID: account.GetID().GetValue(), DocumentNumber: account.GetDocument().GetValue()}
 
 	responder.OK(response)
 }

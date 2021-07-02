@@ -10,15 +10,22 @@ type transactionUseCase struct {
 	accountSerivce     service.AccountService
 }
 
-func NewTransactionUseCase(transactionService service.TransactionService, accountSerivce service.AccountService) *transactionUseCase {
+//TransactonUseCase interface representing the transactionUseCase struct
+type TransactonUseCase interface {
+	CreateTransaction(accountID string, operationType int, amount float64) (model.Transaction, model.InfraError, model.DomainError)
+}
+
+//NewTransactionUseCase creates a new struct of transaction use case
+func NewTransactionUseCase(transactionService service.TransactionService, accountSerivce service.AccountService) TransactonUseCase {
 	return &transactionUseCase{
 		transactionService: transactionService,
 		accountSerivce:     accountSerivce,
 	}
 }
 
+//CreateTransaction creates a transaction
 func (useCase *transactionUseCase) CreateTransaction(accountID string, operationType int, amount float64) (model.Transaction, model.InfraError, model.DomainError) {
-	id, err := model.BuildId(accountID)
+	id, err := model.BuildID(accountID)
 
 	if err != nil {
 		return nil, nil, model.NewDomainError(err.Error())
@@ -28,6 +35,10 @@ func (useCase *transactionUseCase) CreateTransaction(accountID string, operation
 
 	if err != nil {
 		return nil, model.NewInfraError(err.Error()), nil
+	}
+
+	if account == nil {
+		return nil, nil, model.NewDomainError("account not found")
 	}
 
 	amountModel, err := model.NewAmount(amount)

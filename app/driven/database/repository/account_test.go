@@ -1,38 +1,12 @@
 package repository
 
 import (
-	"database/sql"
 	"errors"
-	"log"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/csazevedo/go-account-transaction/app/model"
-	"github.com/google/uuid"
 )
-
-func NewDBMock() (*sql.DB, sqlmock.Sqlmock) {
-	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	if err != nil {
-		log.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-
-	return db, mock
-}
-
-type AccountMock struct {
-	Id             string
-	CreatedAt      string
-	DocumentNumber string
-}
-
-func NewAccountMock() *AccountMock {
-	return &AccountMock{
-		Id:             uuid.New().String(),
-		CreatedAt:      "2021-01-01 00:00:00",
-		DocumentNumber: "03393983024",
-	}
-}
 
 func TestCreateAccountValid(t *testing.T) {
 	db, mock := NewDBMock()
@@ -40,15 +14,18 @@ func TestCreateAccountValid(t *testing.T) {
 	accountMock := NewAccountMock()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO accounts(id, document_number) VALUES(?, ?)").WithArgs(accountMock.Id, accountMock.DocumentNumber).WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectExec("INSERT INTO accounts(id, document_number) VALUES(?, ?)").
+		WithArgs(IDMock{}, accountMock.DocumentNumber).
+		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
-	account, _ := model.BuildAccount(accountMock.Id, accountMock.DocumentNumber, accountMock.CreatedAt)
+	document, _ := model.NewDocument(accountMock.DocumentNumber)
+	account := model.NewAccount(document)
 
 	err := repository.CreateAccount(account)
 
 	if err != nil {
-		t.Errorf("\nError '%s' was not expected", err)
+		t.Errorf("\nAn error: '%s' was not expected", err.Error())
 	}
 }
 
@@ -58,15 +35,18 @@ func TestShouldRollbackCreateAccountOnFailure(t *testing.T) {
 	accountMock := NewAccountMock()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO accounts(id, document_number) VALUES(?, ?)").WithArgs(accountMock.Id, accountMock.DocumentNumber).WillReturnError(errors.New("timeout"))
+	mock.ExpectExec("INSERT INTO accounts(id, document_number) VALUES(?, ?)").
+		WithArgs(IDMock{}, accountMock.DocumentNumber).
+		WillReturnError(errors.New("timeout"))
 	mock.ExpectRollback()
 
-	account, _ := model.BuildAccount(accountMock.Id, accountMock.DocumentNumber, accountMock.CreatedAt)
+	document, _ := model.NewDocument(accountMock.DocumentNumber)
+	account := model.NewAccount(document)
 
 	err := repository.CreateAccount(account)
 
 	if err == nil {
-		t.Errorf("\nError '%s' was expected", err)
+		t.Error("\nAn error was expected")
 	}
 }
 
@@ -77,12 +57,13 @@ func TestShouldErroCreateAccountOnBeginDataBaseTransaction(t *testing.T) {
 
 	mock.ExpectBegin().WillReturnError(errors.New("error"))
 
-	account, _ := model.BuildAccount(accountMock.Id, accountMock.DocumentNumber, accountMock.CreatedAt)
+	document, _ := model.NewDocument(accountMock.DocumentNumber)
+	account := model.NewAccount(document)
 
 	err := repository.CreateAccount(account)
 
 	if err == nil {
-		t.Errorf("\nError '%s' was expected", err)
+		t.Error("\nAn error was expected")
 	}
 }
 
@@ -94,20 +75,20 @@ func TestFindByIDValid(t *testing.T) {
 	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
 
 	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.Id, accountMock.DocumentNumber, accountMock.CreatedAt)
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
 
-	mock.ExpectQuery(query).WithArgs(accountMock.Id).WillReturnRows(rows)
+	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
-	idModel, _ := model.BuildId(accountMock.Id)
+	idModel, _ := model.BuildID(accountMock.ID)
 
 	account, err := repository.FindByID(idModel)
 
 	if err != nil {
-		t.Errorf("\nError '%s' was not expected", err)
+		t.Errorf("\nAn error: '%s' was not expected", err.Error())
 	}
 
-	if account.GetId().GetValue() != accountMock.Id {
-		t.Errorf("\nInvalid ID value: '%v'", accountMock.Id)
+	if account.GetID().GetValue() != accountMock.ID {
+		t.Errorf("\nInvalid ID value: '%v'", accountMock.ID)
 	}
 
 	if account.GetDocument().GetValue() != accountMock.DocumentNumber {
@@ -127,7 +108,7 @@ func TestFindByDocumentValid(t *testing.T) {
 	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
 
 	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.Id, accountMock.DocumentNumber, accountMock.CreatedAt)
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
 
 	mock.ExpectQuery(query).WithArgs(accountMock.DocumentNumber).WillReturnRows(rows)
 
@@ -136,11 +117,11 @@ func TestFindByDocumentValid(t *testing.T) {
 	account, err := repository.FindAccountByDocumentNumber(documentModel)
 
 	if err != nil {
-		t.Errorf("\nError '%s' was not expected", err)
+		t.Errorf("\nAn error: '%s' was not expected", err.Error())
 	}
 
-	if account.GetId().GetValue() != accountMock.Id {
-		t.Errorf("\nInvalid ID value: '%v'", accountMock.Id)
+	if account.GetID().GetValue() != accountMock.ID {
+		t.Errorf("\nInvalid ID value: '%v'", accountMock.ID)
 	}
 
 	if account.GetDocument().GetValue() != accountMock.DocumentNumber {
@@ -161,9 +142,9 @@ func TestFindWithoutResult(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{})
 
-	mock.ExpectQuery(query).WithArgs(accountMock.Id).WillReturnRows(rows)
+	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
-	idModel, _ := model.BuildId(accountMock.Id)
+	idModel, _ := model.BuildID(accountMock.ID)
 
 	account, err := repository.FindByID(idModel)
 
@@ -172,7 +153,7 @@ func TestFindWithoutResult(t *testing.T) {
 	}
 
 	if err != nil {
-		t.Errorf("\nError '%s' was not expected", err)
+		t.Errorf("\nAn error: '%s' was not expected", err.Error())
 	}
 }
 
@@ -184,11 +165,11 @@ func TestFindWithAccountBuildInvalid(t *testing.T) {
 	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
 
 	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.Id, "00000000001", accountMock.CreatedAt)
+		AddRow(accountMock.ID, "00000000001", accountMock.CreatedAt)
 
-	mock.ExpectQuery(query).WithArgs(accountMock.Id).WillReturnRows(rows)
+	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
-	idModel, _ := model.BuildId(accountMock.Id)
+	idModel, _ := model.BuildID(accountMock.ID)
 
 	account, err := repository.FindByID(idModel)
 
@@ -197,7 +178,7 @@ func TestFindWithAccountBuildInvalid(t *testing.T) {
 	}
 
 	if err == nil {
-		t.Errorf("\nError '%s' was expected", err)
+		t.Error("\nAn error was expected")
 	}
 }
 
@@ -208,9 +189,9 @@ func TestFindWithDabaseError(t *testing.T) {
 
 	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
 
-	mock.ExpectQuery(query).WithArgs(accountMock.Id).WillReturnError(errors.New("timeout"))
+	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnError(errors.New("timeout"))
 
-	idModel, _ := model.BuildId(accountMock.Id)
+	idModel, _ := model.BuildID(accountMock.ID)
 
 	account, err := repository.FindByID(idModel)
 
@@ -219,6 +200,6 @@ func TestFindWithDabaseError(t *testing.T) {
 	}
 
 	if err == nil {
-		t.Errorf("\nError '%s' was expected", err)
+		t.Error("\nAn Error was expected")
 	}
 }
