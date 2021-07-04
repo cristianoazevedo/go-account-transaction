@@ -12,12 +12,12 @@ type ID interface {
 }
 
 //NewID create a new id struct
-func NewID() *id {
+func NewID() ID {
 	return &id{value: uuid.New().String()}
 }
 
 //BuildID create a new id struct, with parameters passed
-func BuildID(value string) (*id, error) {
+func BuildID(value string) (ID, error) {
 	valueParsed, err := uuid.Parse(value)
 
 	if err != nil {

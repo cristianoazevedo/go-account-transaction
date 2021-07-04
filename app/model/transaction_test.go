@@ -25,7 +25,7 @@ func TestNewTransactionValid(t *testing.T) {
 		amountByOperatonType = amountModel.GetValue()
 
 		if value != 4 {
-			amountByOperatonType = amountModel.GetValueNegative()
+			amountByOperatonType = amountModel.GetNegativeValue()
 		}
 
 		if amountByOperatonType != transactionModel.GetAmountValueByOperationType() {

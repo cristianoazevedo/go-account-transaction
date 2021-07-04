@@ -18,30 +18,32 @@ func (idMock IDMock) Match(v driver.Value) bool {
 	return ok
 }
 
-type accountMock struct {
+//AccountMock mock for test
+type AccountMock struct {
 	ID             string
 	CreatedAt      string
 	DocumentNumber string
 }
 
 //NewAccountMock mock for test
-func NewAccountMock() *accountMock {
-	return &accountMock{
+func NewAccountMock() *AccountMock {
+	return &AccountMock{
 		ID:             uuid.New().String(),
 		CreatedAt:      "2021-01-01 00:00:00",
 		DocumentNumber: "03393983024",
 	}
 }
 
-type transactionMock struct {
+//TransactionMock mock for test
+type TransactionMock struct {
 	ID            string
 	Amount        float64
 	OperationType int
 }
 
 //NewTransactionMock mock for test
-func NewTransactionMock() *transactionMock {
-	return &transactionMock{
+func NewTransactionMock() *TransactionMock {
+	return &TransactionMock{
 		ID:            uuid.New().String(),
 		Amount:        10.0,
 		OperationType: 1,

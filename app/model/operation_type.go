@@ -5,9 +5,13 @@ type operationType struct {
 }
 
 const (
+	//CashPurchase has the value 1
 	CashPurchase = iota + 1
+	//PurchaseParceled has the value 2
 	PurchaseParceled
+	//Withdraw has the value 3
 	Withdraw
+	//Payment has the value 4
 	Payment
 )
 
@@ -17,7 +21,7 @@ type OperationType interface {
 }
 
 //NewOperationType create a new operationType struct
-func NewOperationType(value int) (*operationType, error) {
+func NewOperationType(value int) (OperationType, error) {
 	if value < CashPurchase || value > Payment {
 		return nil, NewDomainError("operation type invaild")
 	}

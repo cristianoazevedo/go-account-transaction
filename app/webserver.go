@@ -21,13 +21,18 @@ type webserver struct {
 	logAdapter *logger.Logger
 }
 
+//Webserver interface representing the webserver
+type Webserver interface {
+	Run(host string)
+}
+
 type handleRequestFunction func(dw http.ResponseWriter, r *http.Request)
 
 //New bootstrap of application
 //Defines application routes
 //Create a database connection
 //Set the log
-func New(c *config.Config) *webserver {
+func New(c *config.Config) Webserver {
 	router := mux.NewRouter()
 	dbAdapeter := database.NewMySQLConnection(c.DBConfig)
 	logAdapter := logbook.NewLogger()

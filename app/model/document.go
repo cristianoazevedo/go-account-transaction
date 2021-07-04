@@ -6,18 +6,18 @@ type document struct {
 	value string
 }
 
-//NewDocument create a new document struct
-func NewDocument(value string) (*document, error) {
-	if !brdoc.IsCPF(value) {
-		return nil, NewDomainError("Document invalid")
-	}
-
-	return &document{value: value}, nil
-}
-
 //Document interface representing the document struct
 type Document interface {
 	GetValue() string
+}
+
+//NewDocument create a new document struct
+func NewDocument(value string) (Document, error) {
+	if !brdoc.IsCPF(value) {
+		return nil, NewDomainError("document invalid")
+	}
+
+	return &document{value: value}, nil
 }
 
 //GetValue returns the value of document

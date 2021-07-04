@@ -8,6 +8,7 @@ type transaction struct {
 	eventDate     Date
 }
 
+//Transaction interface representing the transaction struct
 type Transaction interface {
 	GetID() ID
 	GetAccount() Account
@@ -17,13 +18,13 @@ type Transaction interface {
 }
 
 //NewTransaction Create a new transaction struct
-func NewTransaction(account Account, operationType OperationType, amount Amount) *transaction {
+func NewTransaction(account Account, operationType OperationType, amount Amount) Transaction {
 	return &transaction{
 		id:            NewID(),
 		account:       account,
 		operationType: operationType,
 		amount:        amount,
-		eventDate:     NewDate("now"),
+		eventDate:     NewDate(),
 	}
 }
 
@@ -53,5 +54,5 @@ func (transaction *transaction) GetAmountValueByOperationType() float64 {
 		return transaction.amount.GetValue()
 	}
 
-	return transaction.amount.GetValueNegative()
+	return transaction.amount.GetNegativeValue()
 }

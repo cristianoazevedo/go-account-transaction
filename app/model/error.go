@@ -19,12 +19,12 @@ type InfraError interface {
 }
 
 //NewDomainError create a new domainError struct
-func NewDomainError(message string) *domainError {
+func NewDomainError(message string) DomainError {
 	return &domainError{err: message}
 }
 
 //NewInfraError create a new infraError struct
-func NewInfraError(message string) *infraError {
+func NewInfraError(message string) InfraError {
 	return &infraError{err: message}
 }
 

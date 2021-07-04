@@ -17,8 +17,14 @@ type accountAction struct {
 	logAdapter *logger.Logger
 }
 
+//AccountAction interface representing the accountAction
+type AccountAction interface {
+	CreateAccount(w http.ResponseWriter, r *http.Request)
+	GetAccount(w http.ResponseWriter, r *http.Request)
+}
+
 //NewAccountAction creates a new struct of acccount action
-func NewAccountAction(dbAdapter *sql.DB, logAdapter *logger.Logger) *accountAction {
+func NewAccountAction(dbAdapter *sql.DB, logAdapter *logger.Logger) AccountAction {
 	return &accountAction{dbAdapter: dbAdapter, logAdapter: logAdapter}
 }
 
@@ -79,7 +85,7 @@ func (action *accountAction) GetAccount(w http.ResponseWriter, r *http.Request) 
 
 	if !found {
 		action.logAdapter.Error("Parameter id not informed")
-		response := ResponseError{Error: "Parameter id not informed"}
+		response := ResponseError{Error: "parameter id not informed"}
 		responder.BadRequest(response)
 		return
 	}

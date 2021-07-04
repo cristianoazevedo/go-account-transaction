@@ -12,8 +12,13 @@ type authorization struct {
 	logAdapter *logger.Logger
 }
 
+//Authorization interface representing the authorization struct
+type Authorization interface {
+	Middleware(next http.Handler) http.Handler
+}
+
 //NewAuthorization creates a new struct of authorization middleware
-func NewAuthorization(logAdapter *logger.Logger) *authorization {
+func NewAuthorization(logAdapter *logger.Logger) Authorization {
 	return &authorization{auth: "0c7ee5a41bff7c8af4d4ff3740b0224d", logAdapter: logAdapter}
 }
 

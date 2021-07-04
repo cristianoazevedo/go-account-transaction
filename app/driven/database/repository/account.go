@@ -10,6 +10,7 @@ type accountRepository struct {
 	dbAdapter *sql.DB
 }
 
+//AcccountRepository interface representing the acccountRepository
 type AcccountRepository interface {
 	CreateAccount(account model.Account) error
 	FindAccountByDocumentNumber(document model.Document) (model.Account, error)

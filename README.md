@@ -52,7 +52,7 @@ make down
 ```
 - **Tests:**
 ```shell
-make tests
+make test
 ```
 - **Application log:**
 ```shell
@@ -64,7 +64,7 @@ make log
 
 # Using the API
 
-#### Authentication:
+### Authentication:
 All requests made to the APIs must be authenticated. The API uses the Basic Authentication approach. That means you have to send the HTTP requests with the Authorization header . For example:
 
 `Authorization:2428892a8ab08c23be9c55177a0c7713`
@@ -73,12 +73,12 @@ To test API use this authorization:
 
 `Authorization:0c7ee5a41bff7c8af4d4ff3740b0224d`
 
-#### Routes:
+### Routes:
 | Endpoint | Method |
 | :------------ | :------------ |
 | /v1/accounts | POST |
 | /v1/accounts/:account-id | GET |
-| /v1/transaction| POST |
+| /v1/transactions| POST |
 
 
 # Account [/accounts]

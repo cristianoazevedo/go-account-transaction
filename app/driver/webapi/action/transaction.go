@@ -16,6 +16,11 @@ type transactionAction struct {
 	logAdapter *logger.Logger
 }
 
+//TransactionAction interface representing the transactionAction
+type TransactionAction interface {
+	CreateTransaction(w http.ResponseWriter, r *http.Request)
+}
+
 type createTransactionBoby struct {
 	AccountID     string  `json:"account_id"`
 	OperationType int     `json:"operation_type"`
@@ -26,8 +31,8 @@ type responseTransaction struct {
 	TransactionID string `json:"transaction_id"`
 }
 
-//NewTransactionAction creates a new struct of trasction action
-func NewTransactionAction(dbAdapter *sql.DB, logAdapter *logger.Logger) *transactionAction {
+//NewTransactionAction creates a new struct of transaction action
+func NewTransactionAction(dbAdapter *sql.DB, logAdapter *logger.Logger) TransactionAction {
 	return &transactionAction{dbAdapter: dbAdapter, logAdapter: logAdapter}
 }
 
@@ -53,7 +58,7 @@ func (action *transactionAction) CreateTransaction(w http.ResponseWriter, r *htt
 
 	useCase := usecases.NewTransactionUseCase(transactionService, accountService)
 
-	tranaction, infraError, domainError := useCase.CreateTransaction(body.AccountID, body.OperationType, body.Amount)
+	transaction, infraError, domainError := useCase.CreateTransaction(body.AccountID, body.OperationType, body.Amount)
 
 	if domainError != nil {
 		action.logAdapter.Errorf("Error to create transaction: %s", domainError.Error())
@@ -69,7 +74,7 @@ func (action *transactionAction) CreateTransaction(w http.ResponseWriter, r *htt
 		return
 	}
 
-	response := responseTransaction{TransactionID: tranaction.GetID().GetValue()}
+	response := responseTransaction{TransactionID: transaction.GetID().GetValue()}
 
 	responder.Created(response)
 }

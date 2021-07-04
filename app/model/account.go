@@ -14,16 +14,16 @@ type Account interface {
 }
 
 //NewAccount create a new account struct
-func NewAccount(document Document) *account {
+func NewAccount(document Document) Account {
 	return &account{
 		id:        NewID(),
-		createdAt: NewDate("today"),
+		createdAt: NewDate(),
 		document:  document,
 	}
 }
 
 //BuildAccount create a new account struct, with parameters passed
-func BuildAccount(id string, document string, createdAt string) (*account, error) {
+func BuildAccount(id string, document string, createdAt string) (Account, error) {
 	idBuilded, err := BuildID(id)
 
 	if err != nil {
@@ -36,7 +36,7 @@ func BuildAccount(id string, document string, createdAt string) (*account, error
 		return nil, err
 	}
 
-	return &account{id: idBuilded, document: newDocument, createdAt: NewDate(createdAt)}, nil
+	return &account{id: idBuilded, document: newDocument, createdAt: BuildDate(createdAt)}, nil
 }
 
 //GetId return the struct ID

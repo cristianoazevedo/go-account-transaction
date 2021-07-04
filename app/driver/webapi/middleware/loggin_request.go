@@ -10,8 +10,13 @@ type loggerRequest struct {
 	logAdapter *logger.Logger
 }
 
+//LoggerRequest interface representing the loggerRequest struct
+type LoggerRequest interface {
+	Middleware(next http.Handler) http.Handler
+}
+
 //NewLoggerRequest creates a new struct of loggerRequest middleware
-func NewLoggerRequest(logAdapter *logger.Logger) *loggerRequest {
+func NewLoggerRequest(logAdapter *logger.Logger) LoggerRequest {
 	return &loggerRequest{logAdapter: logAdapter}
 }
 
