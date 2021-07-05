@@ -14,7 +14,7 @@ func TestCreateTransactionValid(t *testing.T) {
 	accountMock := NewAccountMock()
 	transactionMock := NewTransactionMock()
 
-	accountModel, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	accountModel, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	operationTypeModel, _ := model.NewOperationType(transactionMock.OperationType)
 	amountModel, _ := model.NewAmount(transactionMock.Amount)
 
@@ -44,7 +44,7 @@ func TestShouldRollbackCreateTransactionOnFailure(t *testing.T) {
 	accountMock := NewAccountMock()
 	transactionMock := NewTransactionMock()
 
-	accountModel, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	accountModel, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	operationTypeModel, _ := model.NewOperationType(transactionMock.OperationType)
 	amountModel, _ := model.NewAmount(transactionMock.Amount)
 
@@ -74,7 +74,7 @@ func TestShouldErroCreateTransactionOnBeginDataBaseTransaction(t *testing.T) {
 	accountMock := NewAccountMock()
 	transactionMock := NewTransactionMock()
 
-	accountModel, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	accountModel, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	operationTypeModel, _ := model.NewOperationType(transactionMock.OperationType)
 	amountModel, _ := model.NewAmount(transactionMock.Amount)
 

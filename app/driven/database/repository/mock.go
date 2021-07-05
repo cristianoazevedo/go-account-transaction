@@ -20,17 +20,19 @@ func (idMock IDMock) Match(v driver.Value) bool {
 
 //AccountMock mock for test
 type AccountMock struct {
-	ID             string
-	CreatedAt      string
-	DocumentNumber string
+	ID                   string
+	CreatedAt            string
+	DocumentNumber       string
+	AvailableCreditLimit float64
 }
 
 //NewAccountMock mock for test
 func NewAccountMock() *AccountMock {
 	return &AccountMock{
-		ID:             uuid.New().String(),
-		CreatedAt:      "2021-01-01 00:00:00",
-		DocumentNumber: "03393983024",
+		ID:                   uuid.New().String(),
+		CreatedAt:            "2021-01-01 00:00:00",
+		DocumentNumber:       "03393983024",
+		AvailableCreditLimit: 500,
 	}
 }
 

@@ -24,14 +24,14 @@ func NewAccountRepository(adapter *sql.DB) AcccountRepository {
 
 //FindAccountByDocumentNumber find account by document number
 func (repository *accountRepository) FindAccountByDocumentNumber(document model.Document) (model.Account, error) {
-	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
 
 	return repository.find(query, document.GetValue())
 }
 
 //FindAccountByDocumentNumber find account by account ID
 func (repository *accountRepository) FindByID(idAccount model.ID) (model.Account, error) {
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 
 	return repository.find(query, idAccount.GetValue())
 }
@@ -40,8 +40,9 @@ func (repository *accountRepository) find(queryString string, args ...interface{
 	query := repository.dbAdapter.QueryRow(queryString, args...)
 
 	var id, documentNumber, createAt string
+	var creditLimit float64
 
-	err := query.Scan(&id, &documentNumber, &createAt)
+	err := query.Scan(&id, &documentNumber, &createAt, &creditLimit)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -51,7 +52,7 @@ func (repository *accountRepository) find(queryString string, args ...interface{
 		return nil, err
 	}
 
-	account, err := model.BuildAccount(id, documentNumber, createAt)
+	account, err := model.BuildAccount(id, documentNumber, createAt, creditLimit)
 
 	if err != nil {
 		return nil, err
@@ -70,7 +71,12 @@ func (repository *accountRepository) CreateAccount(account model.Account) (err e
 		return
 	}
 
-	_, err = tx.Exec("INSERT INTO accounts(id, document_number) VALUES(?, ?)", account.GetID().GetValue(), account.GetDocument().GetValue())
+	_, err = tx.Exec(
+		"INSERT INTO accounts(id, document_number, credit_limit) VALUES(?, ?, ?)",
+		account.GetID().GetValue(),
+		account.GetDocument().GetValue(),
+		account.GetAvailableCreditLimit().GetValue(),
+	)
 
 	if err != nil {
 		tx.Rollback()

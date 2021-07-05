@@ -1,9 +1,10 @@
 package model
 
 type account struct {
-	id        ID
-	createdAt Date
-	document  Document
+	id                   ID
+	createdAt            Date
+	document             Document
+	availableCreditLimit AvailableCreditLimit
 }
 
 //Account interface representing the account struct
@@ -11,19 +12,23 @@ type Account interface {
 	GetID() ID
 	GetDocument() Document
 	GetCreatedAt() Date
+	GetAvailableCreditLimit() AvailableCreditLimit
+	NewCreditLimit(newLimit float64)
+	HasCreditLimit(limit float64) bool
 }
 
 //NewAccount create a new account struct
-func NewAccount(document Document) Account {
+func NewAccount(document Document, creditLimit AvailableCreditLimit) Account {
 	return &account{
-		id:        NewID(),
-		createdAt: NewDate(),
-		document:  document,
+		id:                   NewID(),
+		createdAt:            NewDate(),
+		document:             document,
+		availableCreditLimit: creditLimit,
 	}
 }
 
 //BuildAccount create a new account struct, with parameters passed
-func BuildAccount(id string, document string, createdAt string) (Account, error) {
+func BuildAccount(id string, document string, createdAt string, creditLimit float64) (Account, error) {
 	idBuilded, err := BuildID(id)
 
 	if err != nil {
@@ -36,7 +41,13 @@ func BuildAccount(id string, document string, createdAt string) (Account, error)
 		return nil, err
 	}
 
-	return &account{id: idBuilded, document: newDocument, createdAt: BuildDate(createdAt)}, nil
+	newCreditLimit, err := BuildAvailableCreditLimit(creditLimit)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &account{id: idBuilded, document: newDocument, createdAt: BuildDate(createdAt), availableCreditLimit: newCreditLimit}, nil
 }
 
 //GetId return the struct ID
@@ -52,4 +63,18 @@ func (account *account) GetDocument() Document {
 //GetCreatedAt return the struct Date
 func (account *account) GetCreatedAt() Date {
 	return account.createdAt
+}
+
+func (account *account) GetAvailableCreditLimit() AvailableCreditLimit {
+	return account.availableCreditLimit
+}
+
+func (account *account) NewCreditLimit(value float64) {
+	newLimt := account.availableCreditLimit.GetValue() + value
+	creditLimit, _ := BuildAvailableCreditLimit(newLimt)
+	account.availableCreditLimit = creditLimit
+}
+
+func (account *account) HasCreditLimit(limit float64) bool {
+	return account.availableCreditLimit.GetValue() >= limit
 }

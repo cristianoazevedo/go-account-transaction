@@ -11,7 +11,7 @@ type accountUseCase struct {
 
 //AccountUseCase interface representing the accountUseCase struct
 type AccountUseCase interface {
-	CreateAccount(documentNumber string) (model.Account, model.InfraError, model.DomainError)
+	CreateAccount(documentNumber string, creditLimit float64) (model.Account, model.InfraError, model.DomainError)
 	FindAccount(id string) (model.Account, model.InfraError, model.DomainError)
 }
 
@@ -23,7 +23,7 @@ func NewAccountUseCase(service service.AccountService) AccountUseCase {
 }
 
 //CreateAccount create a new account using the document number
-func (useCase *accountUseCase) CreateAccount(documentNumber string) (model.Account, model.InfraError, model.DomainError) {
+func (useCase *accountUseCase) CreateAccount(documentNumber string, creditLimit float64) (model.Account, model.InfraError, model.DomainError) {
 	document, err := model.NewDocument(documentNumber)
 
 	if err != nil {
@@ -40,7 +40,17 @@ func (useCase *accountUseCase) CreateAccount(documentNumber string) (model.Accou
 		return nil, nil, model.NewDomainError("account already exists")
 	}
 
-	accountModel := model.NewAccount(document)
+	creditLimitModel := model.NewAvailableCreditLimit()
+
+	if creditLimit <= 0 {
+		return nil, nil, model.NewDomainError("limit invalid")
+	}
+
+	if creditLimit > 0 {
+		creditLimitModel, _ = model.BuildAvailableCreditLimit(creditLimit)
+	}
+
+	accountModel := model.NewAccount(document, creditLimitModel)
 
 	if err := useCase.service.CreateAccount(accountModel); err != nil {
 		return nil, model.NewInfraError(err.Error()), nil

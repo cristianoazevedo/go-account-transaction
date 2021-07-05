@@ -14,13 +14,14 @@ func TestCreateAccountValid(t *testing.T) {
 	accountMock := NewAccountMock()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO accounts(id, document_number) VALUES(?, ?)").
-		WithArgs(IDMock{}, accountMock.DocumentNumber).
+	mock.ExpectExec("INSERT INTO accounts(id, document_number, credit_limit) VALUES(?, ?, ?)").
+		WithArgs(IDMock{}, accountMock.DocumentNumber, accountMock.AvailableCreditLimit).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
 	document, _ := model.NewDocument(accountMock.DocumentNumber)
-	account := model.NewAccount(document)
+	creditLimit, _ := model.BuildAvailableCreditLimit(accountMock.AvailableCreditLimit)
+	account := model.NewAccount(document, creditLimit)
 
 	err := repository.CreateAccount(account)
 
@@ -35,13 +36,14 @@ func TestShouldRollbackCreateAccountOnFailure(t *testing.T) {
 	accountMock := NewAccountMock()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO accounts(id, document_number) VALUES(?, ?)").
-		WithArgs(IDMock{}, accountMock.DocumentNumber).
+	mock.ExpectExec("INSERT INTO accounts(id, document_number, credit_limit) VALUES(?, ?, ?)").
+		WithArgs(IDMock{}, accountMock.DocumentNumber, accountMock.AvailableCreditLimit).
 		WillReturnError(errors.New("timeout"))
 	mock.ExpectRollback()
 
 	document, _ := model.NewDocument(accountMock.DocumentNumber)
-	account := model.NewAccount(document)
+	creditLimit, _ := model.BuildAvailableCreditLimit(accountMock.AvailableCreditLimit)
+	account := model.NewAccount(document, creditLimit)
 
 	err := repository.CreateAccount(account)
 
@@ -58,7 +60,8 @@ func TestShouldErroCreateAccountOnBeginDataBaseTransaction(t *testing.T) {
 	mock.ExpectBegin().WillReturnError(errors.New("error"))
 
 	document, _ := model.NewDocument(accountMock.DocumentNumber)
-	account := model.NewAccount(document)
+	creditLimit, _ := model.BuildAvailableCreditLimit(accountMock.AvailableCreditLimit)
+	account := model.NewAccount(document, creditLimit)
 
 	err := repository.CreateAccount(account)
 
@@ -72,10 +75,10 @@ func TestFindByIDValid(t *testing.T) {
 	repository := NewAccountRepository(db)
 	accountMock := NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
@@ -105,10 +108,10 @@ func TestFindByDocumentValid(t *testing.T) {
 	repository := NewAccountRepository(db)
 	accountMock := NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
 
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
 	mock.ExpectQuery(query).WithArgs(accountMock.DocumentNumber).WillReturnRows(rows)
 
@@ -138,7 +141,7 @@ func TestFindWithoutResult(t *testing.T) {
 	repository := NewAccountRepository(db)
 	accountMock := NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 
 	rows := sqlmock.NewRows([]string{})
 
@@ -162,10 +165,10 @@ func TestFindWithAccountBuildInvalid(t *testing.T) {
 	repository := NewAccountRepository(db)
 	accountMock := NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, "00000000001", accountMock.CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, "00000000001", accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
@@ -187,7 +190,7 @@ func TestFindWithDabaseError(t *testing.T) {
 	repository := NewAccountRepository(db)
 	accountMock := NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnError(errors.New("timeout"))
 

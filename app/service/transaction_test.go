@@ -27,7 +27,7 @@ func TestCreatTrasansactionValid(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
-	account, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	account, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	amountModel, _ := model.NewAmount(transactionMock.Amount)
 	operationTypeModel, _ := model.NewOperationType(transactionMock.OperationType)
 

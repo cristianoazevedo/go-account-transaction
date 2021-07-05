@@ -37,7 +37,7 @@ Connection to the database:
 ```
   HOST=localhost
   PORT=3306
-  DATABASE=foo
+  DATABASE=xtpo
   USERNAME=root
   PASSWORD=dev
 ```
@@ -111,6 +111,12 @@ curl --location --request POST 'http://localhost:3001/v1/accounts' \
 }'
 ```
 ### Querying an account's information [GET /:account-id]
+
+Request exemple using cURL:
+```shell
+curl --location --request GET 'http://localhost:3001/v1/accounts/3e0147b4-b777-4994-be9c-921361d8c06d' \
+--header 'Authorization: 0c7ee5a41bff7c8af4d4ff3740b0224d'
+```
 Response: Status 200 OK
 ```json
 {

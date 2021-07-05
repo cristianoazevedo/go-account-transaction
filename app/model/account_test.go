@@ -13,7 +13,8 @@ func TestNewAcccountValid(t *testing.T) {
 	for key, value := range values {
 		var id, document, createdAt interface{}
 		documentNumberModel, _ := NewDocument(value)
-		accountModel := NewAccount(documentNumberModel)
+		creditLimitModel := NewAvailableCreditLimit()
+		accountModel := NewAccount(documentNumberModel, creditLimitModel)
 		id = accountModel.GetID()
 		document = accountModel.GetDocument()
 		createdAt = accountModel.GetCreatedAt()
@@ -34,24 +35,27 @@ func TestNewAcccountValid(t *testing.T) {
 
 func TestBuildAccountValid(t *testing.T) {
 	values := []struct {
-		id             string
-		documentNumber string
-		createdAt      string
+		id                   string
+		documentNumber       string
+		createdAt            string
+		availableCreditLimit float64
 	}{
 		{
 			"99c49b65-cc11-487f-864d-55dbb6c90a67",
 			"99407901041",
 			"2019-03-09 12:00:08",
+			500,
 		},
 		{
 			"83ef78ca-478b-49fd-9514-d285f146969b",
 			"60398738092",
 			"2019-03-09 12:00:08",
+			700,
 		},
 	}
 
 	for key, value := range values {
-		accountModel, err := BuildAccount(value.id, value.documentNumber, value.createdAt)
+		accountModel, err := BuildAccount(value.id, value.documentNumber, value.createdAt, value.availableCreditLimit)
 
 		if err != nil {
 			t.Errorf("\nTest at position [%d].\nAn error '%s' was not expected", key, err)
@@ -74,24 +78,27 @@ func TestBuildAccountValid(t *testing.T) {
 
 func TestBuildAccountInvalid(t *testing.T) {
 	values := []struct {
-		id             string
-		documentNumber string
-		createdAt      string
+		id                   string
+		documentNumber       string
+		createdAt            string
+		availableCreditLimit float64
 	}{
 		{
 			"99c49b65-cc11-487f-864d",
 			"99407901041",
 			"2019-03-09 12:00:08",
+			0,
 		},
 		{
 			"99c49b65-cc11-487f-864d-55dbb6c90a67",
 			"00000000002",
 			"2019-03-09 12:00:08",
+			-700,
 		},
 	}
 
 	for key, value := range values {
-		_, err := BuildAccount(value.id, value.documentNumber, value.createdAt)
+		_, err := BuildAccount(value.id, value.documentNumber, value.createdAt, value.availableCreditLimit)
 
 		if err == nil {
 			t.Errorf("\nTest at position [%d].\nExpected error", key)

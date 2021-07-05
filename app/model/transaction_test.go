@@ -11,11 +11,11 @@ func TestNewTransactionValid(t *testing.T) {
 		var id, account, operationType, amount interface{}
 		var amountByOperatonType float64
 		documentModel, _ := NewDocument("99407901041")
-		accountModel := NewAccount(documentModel)
+		accountModel := NewAccount(documentModel, NewAvailableCreditLimit())
 		operationTypeModel, _ := NewOperationType(value)
 		amountModel, _ := NewAmount(10.0)
 
-		transactionModel := NewTransaction(accountModel, operationTypeModel, amountModel)
+		transactionModel, _ := NewTransaction(accountModel, operationTypeModel, amountModel)
 
 		id = transactionModel.GetID()
 		account = transactionModel.GetAccount()

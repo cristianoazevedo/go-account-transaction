@@ -44,6 +44,18 @@ func (repository *transactionRepository) CreateTransaction(transaction model.Tra
 		return
 	}
 
+	_, err = tx.Exec(
+		"UPDATE accounts set credit_limit = ? where id = ?",
+		transaction.GetAccount().GetAvailableCreditLimit().GetValue(),
+		transaction.GetAccount().GetID().GetValue(),
+	)
+
+	if err != nil {
+		tx.Rollback()
+
+		return
+	}
+
 	err = tx.Commit()
 
 	return

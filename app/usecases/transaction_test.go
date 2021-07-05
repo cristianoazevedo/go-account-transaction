@@ -19,9 +19,9 @@ func TestCreateTransactionValid(t *testing.T) {
 	transactionRepository := repository.NewTransactionRepository(db)
 	transactionService := service.NewTransactionService(transactionRepository)
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
 	mock.ExpectBegin()
@@ -58,9 +58,9 @@ func TestCreateTransactionInvalid(t *testing.T) {
 	transactionRepository := repository.NewTransactionRepository(db)
 	transactionService := service.NewTransactionService(transactionRepository)
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
 	mock.ExpectBegin()
@@ -97,7 +97,7 @@ func TestCreateTransactionWithAccountNotFound(t *testing.T) {
 	transactionRepository := repository.NewTransactionRepository(db)
 	transactionService := service.NewTransactionService(transactionRepository)
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 	rows := sqlmock.NewRows([]string{})
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
@@ -124,7 +124,7 @@ func TestCreateTransactionWithFindAccountWithError(t *testing.T) {
 	transactionRepository := repository.NewTransactionRepository(db)
 	transactionService := service.NewTransactionService(transactionRepository)
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnError(errors.New("timeout"))
 
 	usecase := NewTransactionUseCase(transactionService, accountSerivce)
@@ -150,9 +150,9 @@ func TestCreateTransactionWithAmountInvalid(t *testing.T) {
 	transactionRepository := repository.NewTransactionRepository(db)
 	transactionService := service.NewTransactionService(transactionRepository)
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
 	usecase := NewTransactionUseCase(transactionService, accountSerivce)
@@ -178,9 +178,9 @@ func TestCreateTransactionWithOperationTypeInvalid(t *testing.T) {
 	transactionRepository := repository.NewTransactionRepository(db)
 	transactionService := service.NewTransactionService(transactionRepository)
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
 	usecase := NewTransactionUseCase(transactionService, accountSerivce)

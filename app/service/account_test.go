@@ -15,12 +15,12 @@ func TestCreateAccountValid(t *testing.T) {
 	accountMock := repository.NewAccountMock()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO accounts(id, document_number) VALUES(?, ?)").
-		WithArgs(repository.IDMock{}, accountMock.DocumentNumber).
+	mock.ExpectExec("INSERT INTO accounts(id, document_number, credit_limit) VALUES(?, ?, ?)").
+		WithArgs(repository.IDMock{}, accountMock.DocumentNumber, accountMock.AvailableCreditLimit).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
-	account, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	account, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
 	err := accountSerivce.CreateAccount(account)
 
@@ -35,10 +35,10 @@ func TestFindAccountByIDValid(t *testing.T) {
 	accountSerivce := NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
@@ -57,10 +57,10 @@ func TestFindAccountByDocumentNumberValid(t *testing.T) {
 	accountSerivce := NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
 
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
 	mock.ExpectQuery(query).WithArgs(accountMock.DocumentNumber).WillReturnRows(rows)
 

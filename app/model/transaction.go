@@ -18,14 +18,32 @@ type Transaction interface {
 }
 
 //NewTransaction Create a new transaction struct
-func NewTransaction(account Account, operationType OperationType, amount Amount) Transaction {
-	return &transaction{
+func NewTransaction(account Account, operationType OperationType, amount Amount) (Transaction, error) {
+	err := checkAccountCreditLimt(account, operationType, amount)
+
+	if err != nil {
+		return nil, err
+	}
+
+	transactionModel := &transaction{
 		id:            NewID(),
 		account:       account,
 		operationType: operationType,
 		amount:        amount,
 		eventDate:     NewDate(),
 	}
+
+	account.NewCreditLimit(transactionModel.GetAmountValueByOperationType())
+
+	return transactionModel, nil
+}
+
+func checkAccountCreditLimt(account Account, operationType OperationType, amount Amount) error {
+	if operationType.GetValue() != Payment && !account.HasCreditLimit(amount.GetValue()) {
+		return NewDomainError("limit insufient")
+	}
+
+	return nil
 }
 
 //GetId return the struct ID

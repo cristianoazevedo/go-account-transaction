@@ -53,7 +53,11 @@ func (useCase *transactionUseCase) CreateTransaction(accountID string, operation
 		return nil, nil, model.NewDomainError(err.Error())
 	}
 
-	transaction := model.NewTransaction(account, operationTypeModel, amountModel)
+	transaction, err := model.NewTransaction(account, operationTypeModel, amountModel)
+
+	if err != nil {
+		return nil, nil, model.NewDomainError(err.Error())
+	}
 
 	if err := useCase.transactionService.CreateTransaction(transaction); err != nil {
 		return nil, model.NewInfraError(err.Error()), nil

@@ -16,7 +16,7 @@ func TestCreateAccountWithDocumentInvalid(t *testing.T) {
 
 	usecase := NewAccountUseCase(accountSerivce)
 
-	_, infraError, domainError := usecase.CreateAccount("00000000001")
+	_, infraError, domainError := usecase.CreateAccount("00000000001", 700)
 
 	if infraError != nil {
 		t.Errorf("\nInfra error: '%s' was not expected", infraError.Error())
@@ -33,16 +33,16 @@ func TestCreateAccountWithDocumentFound(t *testing.T) {
 	accountSerivce := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
 
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
 	mock.ExpectQuery(query).WithArgs(accountMock.DocumentNumber).WillReturnRows(rows)
 
 	usecase := NewAccountUseCase(accountSerivce)
 
-	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber)
+	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber, accountMock.AvailableCreditLimit)
 
 	if infraError != nil {
 		t.Errorf("\nInfra error: '%s' was not expected", infraError.Error())
@@ -59,13 +59,13 @@ func TestCreateAccountWithFindDocumentWithError(t *testing.T) {
 	accountSerivce := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
 
 	mock.ExpectQuery(query).WithArgs(accountMock.DocumentNumber).WillReturnError(errors.New("timeout"))
 
 	usecase := NewAccountUseCase(accountSerivce)
 
-	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber)
+	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber, accountMock.AvailableCreditLimit)
 
 	if infraError == nil {
 		t.Error("\nInfra error was expected")
@@ -82,19 +82,19 @@ func TestShouldRollbackCreateAccountOnFailure(t *testing.T) {
 	accountSerivce := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
 	rows := sqlmock.NewRows([]string{})
 	mock.ExpectQuery(query).WithArgs(accountMock.DocumentNumber).WillReturnRows(rows)
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO accounts(id, document_number) VALUES(?, ?)").
-		WithArgs(repository.IDMock{}, accountMock.DocumentNumber).
+	mock.ExpectExec("INSERT INTO accounts(id, document_number, credit_limit) VALUES(?, ?, ?)").
+		WithArgs(repository.IDMock{}, accountMock.DocumentNumber, accountMock.AvailableCreditLimit).
 		WillReturnError(errors.New("timeout"))
 	mock.ExpectRollback()
 
 	usecase := NewAccountUseCase(accountSerivce)
 
-	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber)
+	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber, accountMock.AvailableCreditLimit)
 
 	if infraError == nil {
 		t.Error("\nInfra error was expected")
@@ -111,10 +111,10 @@ func TestFindAccountFound(t *testing.T) {
 	accountSerivce := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
@@ -137,10 +137,10 @@ func TestFindAccountWithInfraError(t *testing.T) {
 	accountSerivce := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where id = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 
-	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at"}).
-		AddRow(accountMock.ID, "00000000001", accountMock.CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "document_number", "created_at", "credit_limit"}).
+		AddRow(accountMock.ID, "00000000001", accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
@@ -181,21 +181,21 @@ func TestCreateAccountValid(t *testing.T) {
 
 	accountMock := repository.NewAccountMock()
 
-	query := "SELECT id, document_number, created_at FROM accounts where document_number = ?"
+	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
 
 	rows := sqlmock.NewRows([]string{})
 
 	mock.ExpectQuery(query).WithArgs(accountMock.DocumentNumber).WillReturnRows(rows)
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO accounts(id, document_number) VALUES(?, ?)").
-		WithArgs(repository.IDMock{}, accountMock.DocumentNumber).
+	mock.ExpectExec("INSERT INTO accounts(id, document_number, credit_limit) VALUES(?, ?, ?)").
+		WithArgs(repository.IDMock{}, accountMock.DocumentNumber, accountMock.AvailableCreditLimit).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
 	usecase := NewAccountUseCase(accountSerivce)
 
-	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber)
+	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber, accountMock.AvailableCreditLimit)
 
 	if infraError != nil {
 		t.Errorf("\nInfra error: '%s' was not expected", infraError.Error())

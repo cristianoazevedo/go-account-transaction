@@ -29,7 +29,8 @@ func NewAccountAction(dbAdapter *sql.DB, logAdapter *logger.Logger) AccountActio
 }
 
 type createAccountBody struct {
-	DocumentNumber string `json:"document_number"`
+	DocumentNumber string  `json:"document_number"`
+	CreditLimit    float64 `json:"credit_limit,omitempty"`
 }
 
 type responseAccount struct {
@@ -56,7 +57,7 @@ func (action *accountAction) CreateAccount(w http.ResponseWriter, r *http.Reques
 
 	useCase := usecases.NewAccountUseCase(service)
 
-	account, infraError, domainError := useCase.CreateAccount(body.DocumentNumber)
+	account, infraError, domainError := useCase.CreateAccount(body.DocumentNumber, body.CreditLimit)
 
 	if domainError != nil {
 		action.logAdapter.Errorf("Error to create account: %s", domainError.Error())
