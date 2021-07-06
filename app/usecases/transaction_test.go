@@ -33,6 +33,12 @@ func TestCreateTransactionValid(t *testing.T) {
 			transactionMock.Amount*-1,
 		).
 		WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectExec("UPDATE accounts set credit_limit = ? where id = ?").
+		WithArgs(
+			accountMock.AvailableCreditLimit+transactionMock.Amount*-1,
+			accountMock.ID,
+		).
+		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
 	usecase := NewTransactionUseCase(transactionService, accountSerivce)

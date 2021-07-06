@@ -18,7 +18,7 @@ func TestCreateTransactionValid(t *testing.T) {
 	operationTypeModel, _ := model.NewOperationType(transactionMock.OperationType)
 	amountModel, _ := model.NewAmount(transactionMock.Amount)
 
-	transaction := model.NewTransaction(accountModel, operationTypeModel, amountModel)
+	transaction, _ := model.NewTransaction(accountModel, operationTypeModel, amountModel)
 
 	mock.ExpectBegin()
 	mock.ExpectExec("INSERT INTO transactions(id, account_id, operation_type, amount) VALUES(?,?,?,?)").
@@ -29,6 +29,13 @@ func TestCreateTransactionValid(t *testing.T) {
 			transactionMock.Amount*-1,
 		).
 		WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectExec("UPDATE accounts set credit_limit = ? where id = ?").
+		WithArgs(
+			transaction.GetAccount().GetAvailableCreditLimit().GetValue(),
+			accountMock.ID,
+		).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
 	mock.ExpectCommit()
 
 	err := repository.CreateTransaction(transaction)
@@ -48,7 +55,7 @@ func TestShouldRollbackCreateTransactionOnFailure(t *testing.T) {
 	operationTypeModel, _ := model.NewOperationType(transactionMock.OperationType)
 	amountModel, _ := model.NewAmount(transactionMock.Amount)
 
-	transaction := model.NewTransaction(accountModel, operationTypeModel, amountModel)
+	transaction, _ := model.NewTransaction(accountModel, operationTypeModel, amountModel)
 
 	mock.ExpectBegin()
 	mock.ExpectExec("INSERT INTO transactions(id, account_id, operation_type, amount) VALUES(?,?,?,?)").
@@ -78,7 +85,7 @@ func TestShouldErroCreateTransactionOnBeginDataBaseTransaction(t *testing.T) {
 	operationTypeModel, _ := model.NewOperationType(transactionMock.OperationType)
 	amountModel, _ := model.NewAmount(transactionMock.Amount)
 
-	transaction := model.NewTransaction(accountModel, operationTypeModel, amountModel)
+	transaction, _ := model.NewTransaction(accountModel, operationTypeModel, amountModel)
 
 	mock.ExpectBegin().WillReturnError(errors.New("error"))
 

@@ -25,13 +25,19 @@ func TestCreatTrasansactionValid(t *testing.T) {
 			transactionMock.Amount*-1,
 		).
 		WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectExec("UPDATE accounts set credit_limit = ? where id = ?").
+		WithArgs(
+			accountMock.AvailableCreditLimit+transactionMock.Amount*-1,
+			accountMock.ID,
+		).
+		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
 	account, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	amountModel, _ := model.NewAmount(transactionMock.Amount)
 	operationTypeModel, _ := model.NewOperationType(transactionMock.OperationType)
 
-	transaction := model.NewTransaction(account, operationTypeModel, amountModel)
+	transaction, _ := model.NewTransaction(account, operationTypeModel, amountModel)
 
 	err := transactionService.CreateTransaction(transaction)
 
