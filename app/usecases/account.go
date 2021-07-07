@@ -42,10 +42,6 @@ func (useCase *accountUseCase) CreateAccount(documentNumber string, creditLimit 
 
 	creditLimitModel := model.NewAvailableCreditLimit()
 
-	if creditLimit <= 0 {
-		return nil, nil, model.NewDomainError("limit invalid")
-	}
-
 	if creditLimit > 0 {
 		creditLimitModel, _ = model.BuildAvailableCreditLimit(creditLimit)
 	}
