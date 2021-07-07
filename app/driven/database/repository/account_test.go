@@ -185,7 +185,7 @@ func TestFindWithAccountBuildInvalid(t *testing.T) {
 	}
 }
 
-func TestFindWithDabaseError(t *testing.T) {
+func TestFindWithDatabaseError(t *testing.T) {
 	db, mock := NewDBMock()
 	repository := NewAccountRepository(db)
 	accountMock := NewAccountMock()

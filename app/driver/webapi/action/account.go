@@ -113,8 +113,8 @@ func (action *accountAction) GetAccount(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if account == nil {
-		reponse := ResponseInfo{Info: "account not found"}
-		responder.NotFound(reponse)
+		response := ResponseInfo{Info: "account not found"}
+		responder.NotFound(response)
 		return
 	}
 

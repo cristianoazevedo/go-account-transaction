@@ -21,7 +21,7 @@ type TransactionAction interface {
 	CreateTransaction(w http.ResponseWriter, r *http.Request)
 }
 
-type createTransactionBoby struct {
+type createTransactionBody struct {
 	AccountID     string  `json:"account_id"`
 	OperationType int     `json:"operation_type"`
 	Amount        float64 `json:"amount"`
@@ -38,7 +38,7 @@ func NewTransactionAction(dbAdapter *sql.DB, logAdapter *logger.Logger) Transact
 
 //CreateAccount action responsible for receiving a request and creating an transaction
 func (action *transactionAction) CreateTransaction(w http.ResponseWriter, r *http.Request) {
-	var body createTransactionBoby
+	var body createTransactionBody
 	responder := NewResponder(w)
 
 	err := json.NewDecoder(r.Body).Decode(&body)

@@ -12,7 +12,7 @@ import (
 func TestCreateTransactionValid(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 	transactionMock := repository.NewTransactionMock()
 
@@ -41,7 +41,7 @@ func TestCreateTransactionValid(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
-	usecase := NewTransactionUseCase(transactionService, accountSerivce)
+	usecase := NewTransactionUseCase(transactionService, accountService)
 
 	_, infraError, domainError := usecase.CreateTransaction(accountMock.ID, transactionMock.OperationType, transactionMock.Amount)
 
@@ -57,7 +57,7 @@ func TestCreateTransactionValid(t *testing.T) {
 func TestCreateTransactionInvalid(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 	transactionMock := repository.NewTransactionMock()
 
@@ -80,7 +80,7 @@ func TestCreateTransactionInvalid(t *testing.T) {
 		WillReturnError(errors.New("timeout"))
 	mock.ExpectRollback()
 
-	usecase := NewTransactionUseCase(transactionService, accountSerivce)
+	usecase := NewTransactionUseCase(transactionService, accountService)
 
 	_, infraError, domainError := usecase.CreateTransaction(accountMock.ID, transactionMock.OperationType, transactionMock.Amount)
 
@@ -96,7 +96,7 @@ func TestCreateTransactionInvalid(t *testing.T) {
 func TestCreateTransactionWithAccountNotFound(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 	transactionMock := repository.NewTransactionMock()
 
@@ -107,7 +107,7 @@ func TestCreateTransactionWithAccountNotFound(t *testing.T) {
 	rows := sqlmock.NewRows([]string{})
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
-	usecase := NewTransactionUseCase(transactionService, accountSerivce)
+	usecase := NewTransactionUseCase(transactionService, accountService)
 
 	_, infraError, domainError := usecase.CreateTransaction(accountMock.ID, transactionMock.OperationType, transactionMock.Amount)
 
@@ -123,7 +123,7 @@ func TestCreateTransactionWithAccountNotFound(t *testing.T) {
 func TestCreateTransactionWithFindAccountWithError(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 	transactionMock := repository.NewTransactionMock()
 
@@ -133,7 +133,7 @@ func TestCreateTransactionWithFindAccountWithError(t *testing.T) {
 	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnError(errors.New("timeout"))
 
-	usecase := NewTransactionUseCase(transactionService, accountSerivce)
+	usecase := NewTransactionUseCase(transactionService, accountService)
 
 	_, infraError, domainError := usecase.CreateTransaction(accountMock.ID, transactionMock.OperationType, transactionMock.Amount)
 
@@ -149,7 +149,7 @@ func TestCreateTransactionWithFindAccountWithError(t *testing.T) {
 func TestCreateTransactionWithAmountInvalid(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 	transactionMock := repository.NewTransactionMock()
 
@@ -161,7 +161,7 @@ func TestCreateTransactionWithAmountInvalid(t *testing.T) {
 		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
-	usecase := NewTransactionUseCase(transactionService, accountSerivce)
+	usecase := NewTransactionUseCase(transactionService, accountService)
 
 	_, infraError, domainError := usecase.CreateTransaction(accountMock.ID, transactionMock.OperationType, 0)
 
@@ -177,7 +177,7 @@ func TestCreateTransactionWithAmountInvalid(t *testing.T) {
 func TestCreateTransactionWithOperationTypeInvalid(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 	transactionMock := repository.NewTransactionMock()
 
@@ -189,7 +189,7 @@ func TestCreateTransactionWithOperationTypeInvalid(t *testing.T) {
 		AddRow(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
-	usecase := NewTransactionUseCase(transactionService, accountSerivce)
+	usecase := NewTransactionUseCase(transactionService, accountService)
 
 	_, infraError, domainError := usecase.CreateTransaction(accountMock.ID, 5, transactionMock.Amount)
 
@@ -205,13 +205,13 @@ func TestCreateTransactionWithOperationTypeInvalid(t *testing.T) {
 func TestCreateTransactionWithBuildAccountIdInvalid(t *testing.T) {
 	db, _ := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	transactionMock := repository.NewTransactionMock()
 
 	transactionRepository := repository.NewTransactionRepository(db)
 	transactionService := service.NewTransactionService(transactionRepository)
 
-	usecase := NewTransactionUseCase(transactionService, accountSerivce)
+	usecase := NewTransactionUseCase(transactionService, accountService)
 
 	_, infraError, domainError := usecase.CreateTransaction("99c49b65-cc11-487f-864d-55dbb6c90a6", transactionMock.OperationType, transactionMock.Amount)
 

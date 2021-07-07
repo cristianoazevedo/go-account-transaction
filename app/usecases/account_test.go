@@ -12,9 +12,9 @@ import (
 func TestCreateAccountWithDocumentInvalid(t *testing.T) {
 	db, _ := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 
-	usecase := NewAccountUseCase(accountSerivce)
+	usecase := NewAccountUseCase(accountService)
 
 	_, infraError, domainError := usecase.CreateAccount("00000000001", 700)
 
@@ -30,7 +30,7 @@ func TestCreateAccountWithDocumentInvalid(t *testing.T) {
 func TestCreateAccountWithDocumentFound(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
 	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
@@ -40,7 +40,7 @@ func TestCreateAccountWithDocumentFound(t *testing.T) {
 
 	mock.ExpectQuery(query).WithArgs(accountMock.DocumentNumber).WillReturnRows(rows)
 
-	usecase := NewAccountUseCase(accountSerivce)
+	usecase := NewAccountUseCase(accountService)
 
 	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber, accountMock.AvailableCreditLimit)
 
@@ -56,14 +56,14 @@ func TestCreateAccountWithDocumentFound(t *testing.T) {
 func TestCreateAccountWithFindDocumentWithError(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
 	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
 
 	mock.ExpectQuery(query).WithArgs(accountMock.DocumentNumber).WillReturnError(errors.New("timeout"))
 
-	usecase := NewAccountUseCase(accountSerivce)
+	usecase := NewAccountUseCase(accountService)
 
 	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber, accountMock.AvailableCreditLimit)
 
@@ -79,7 +79,7 @@ func TestCreateAccountWithFindDocumentWithError(t *testing.T) {
 func TestShouldRollbackCreateAccountOnFailure(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
 	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
@@ -92,7 +92,7 @@ func TestShouldRollbackCreateAccountOnFailure(t *testing.T) {
 		WillReturnError(errors.New("timeout"))
 	mock.ExpectRollback()
 
-	usecase := NewAccountUseCase(accountSerivce)
+	usecase := NewAccountUseCase(accountService)
 
 	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber, accountMock.AvailableCreditLimit)
 
@@ -108,7 +108,7 @@ func TestShouldRollbackCreateAccountOnFailure(t *testing.T) {
 func TestFindAccountFound(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
 	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
@@ -118,7 +118,7 @@ func TestFindAccountFound(t *testing.T) {
 
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
-	usecase := NewAccountUseCase(accountSerivce)
+	usecase := NewAccountUseCase(accountService)
 
 	_, infraError, domainError := usecase.FindAccount(accountMock.ID)
 
@@ -134,7 +134,7 @@ func TestFindAccountFound(t *testing.T) {
 func TestFindAccountWithInfraError(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
 	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
@@ -144,7 +144,7 @@ func TestFindAccountWithInfraError(t *testing.T) {
 
 	mock.ExpectQuery(query).WithArgs(accountMock.ID).WillReturnRows(rows)
 
-	usecase := NewAccountUseCase(accountSerivce)
+	usecase := NewAccountUseCase(accountService)
 
 	_, infraError, domainError := usecase.FindAccount(accountMock.ID)
 
@@ -160,8 +160,8 @@ func TestFindAccountWithInfraError(t *testing.T) {
 func TestFindAccountWithDomainError(t *testing.T) {
 	db, _ := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
-	usecase := NewAccountUseCase(accountSerivce)
+	accountService := service.NewAccountService(accountRepository)
+	usecase := NewAccountUseCase(accountService)
 
 	_, infraError, domainError := usecase.FindAccount("99c49b65-cc11-487f-864d-55dbb6c90a6")
 
@@ -177,7 +177,7 @@ func TestFindAccountWithDomainError(t *testing.T) {
 func TestCreateAccountValid(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := service.NewAccountService(accountRepository)
+	accountService := service.NewAccountService(accountRepository)
 
 	accountMock := repository.NewAccountMock()
 
@@ -193,7 +193,7 @@ func TestCreateAccountValid(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
-	usecase := NewAccountUseCase(accountSerivce)
+	usecase := NewAccountUseCase(accountService)
 
 	_, infraError, domainError := usecase.CreateAccount(accountMock.DocumentNumber, accountMock.AvailableCreditLimit)
 

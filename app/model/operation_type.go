@@ -23,7 +23,7 @@ type OperationType interface {
 //NewOperationType create a new operationType struct
 func NewOperationType(value int) (OperationType, error) {
 	if value < CashPurchase || value > Payment {
-		return nil, NewDomainError("operation type invaild")
+		return nil, NewDomainError("operation type invalid")
 	}
 
 	return &operationType{value: value}, nil

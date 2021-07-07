@@ -41,7 +41,7 @@ func (authorization *authorization) Middleware(next http.Handler) http.Handler {
 		}
 
 		authorization.logAdapter.Infof("Authorization invalid: %s", authorizationHeader)
-		reponseError := action.ResponseError{Error: "authorization invalid"}
-		responder.Forbidden(reponseError)
+		responseError := action.ResponseError{Error: "authorization invalid"}
+		responder.Forbidden(responseError)
 	})
 }

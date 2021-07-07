@@ -7,7 +7,7 @@ import (
 
 type transactionUseCase struct {
 	transactionService service.TransactionService
-	accountSerivce     service.AccountService
+	accountService     service.AccountService
 }
 
 //TransactonUseCase interface representing the transactionUseCase struct
@@ -16,10 +16,10 @@ type TransactonUseCase interface {
 }
 
 //NewTransactionUseCase creates a new struct of transaction use case
-func NewTransactionUseCase(transactionService service.TransactionService, accountSerivce service.AccountService) TransactonUseCase {
+func NewTransactionUseCase(transactionService service.TransactionService, accountService service.AccountService) TransactonUseCase {
 	return &transactionUseCase{
 		transactionService: transactionService,
-		accountSerivce:     accountSerivce,
+		accountService:     accountService,
 	}
 }
 
@@ -31,7 +31,7 @@ func (useCase *transactionUseCase) CreateTransaction(accountID string, operation
 		return nil, nil, model.NewDomainError(err.Error())
 	}
 
-	account, err := useCase.accountSerivce.FindAccountByID(id)
+	account, err := useCase.accountService.FindAccountByID(id)
 
 	if err != nil {
 		return nil, model.NewInfraError(err.Error()), nil

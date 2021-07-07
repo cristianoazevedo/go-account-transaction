@@ -8,7 +8,7 @@ import (
 	"github.com/csazevedo/go-account-transaction/app/model"
 )
 
-func TestCreatTrasansactionValid(t *testing.T) {
+func TestCreatTransanctionValid(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountMock := repository.NewAccountMock()
 	transactionMock := repository.NewTransactionMock()

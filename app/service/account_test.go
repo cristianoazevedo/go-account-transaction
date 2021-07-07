@@ -11,7 +11,7 @@ import (
 func TestCreateAccountValid(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := NewAccountService(accountRepository)
+	accountService := NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
 	mock.ExpectBegin()
@@ -22,7 +22,7 @@ func TestCreateAccountValid(t *testing.T) {
 
 	account, _ := model.BuildAccount(accountMock.ID, accountMock.DocumentNumber, accountMock.CreatedAt, accountMock.AvailableCreditLimit)
 
-	err := accountSerivce.CreateAccount(account)
+	err := accountService.CreateAccount(account)
 
 	if err != nil {
 		t.Errorf("\nAn error '%s' was not expected", err.Error())
@@ -32,7 +32,7 @@ func TestCreateAccountValid(t *testing.T) {
 func TestFindAccountByIDValid(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := NewAccountService(accountRepository)
+	accountService := NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
 	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where id = ?"
@@ -44,7 +44,7 @@ func TestFindAccountByIDValid(t *testing.T) {
 
 	idModel, _ := model.BuildID(accountMock.ID)
 
-	_, err := accountSerivce.FindAccountByID(idModel)
+	_, err := accountService.FindAccountByID(idModel)
 
 	if err != nil {
 		t.Errorf("\nAn error '%s' was not expected", err.Error())
@@ -54,7 +54,7 @@ func TestFindAccountByIDValid(t *testing.T) {
 func TestFindAccountByDocumentNumberValid(t *testing.T) {
 	db, mock := repository.NewDBMock()
 	accountRepository := repository.NewAccountRepository(db)
-	accountSerivce := NewAccountService(accountRepository)
+	accountService := NewAccountService(accountRepository)
 	accountMock := repository.NewAccountMock()
 
 	query := "SELECT id, document_number, created_at, credit_limit FROM accounts where document_number = ?"
@@ -66,7 +66,7 @@ func TestFindAccountByDocumentNumberValid(t *testing.T) {
 
 	documentModel, _ := model.NewDocument(accountMock.DocumentNumber)
 
-	_, err := accountSerivce.FindAccountByDocumentNumber(documentModel)
+	_, err := accountService.FindAccountByDocumentNumber(documentModel)
 
 	if err != nil {
 		t.Errorf("\nAn error '%s' was not expected", err.Error())

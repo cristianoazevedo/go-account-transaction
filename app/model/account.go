@@ -70,8 +70,8 @@ func (account *account) GetAvailableCreditLimit() AvailableCreditLimit {
 }
 
 func (account *account) NewCreditLimit(value float64) {
-	newLimt := account.availableCreditLimit.GetValue() + value
-	creditLimit, _ := BuildAvailableCreditLimit(newLimt)
+	newLimit := account.availableCreditLimit.GetValue() + value
+	creditLimit, _ := BuildAvailableCreditLimit(newLimit)
 	account.availableCreditLimit = creditLimit
 }
 
